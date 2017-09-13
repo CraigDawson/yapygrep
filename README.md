@@ -6,7 +6,7 @@ A Python 3 file grepper like UniversalCodeGrep [ucg](https://github.com/gvansick
 * PyQt5 GUI
     * if cmdline argst then GUI pops-up and search runs (-g) else GUI starts and waits for user input
 
-* Use
+* Usage
     * yapygrep [switches] pattern [files/dirs]
     
 * Switches
@@ -19,6 +19,6 @@ A Python 3 file grepper like UniversalCodeGrep [ucg](https://github.com/gvansick
 * regex
 
 ## Interpreter
-* [pypy](https://pypy.org) if wourds quit PyQt5
+* [pypy](https://pypy.org) if it works in PyQt5
 
 
