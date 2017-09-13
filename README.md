@@ -1,6 +1,6 @@
 # yapygrep
 
-A Python 3 file grepper like UniversalCodeGrep [ucg](https://github.com/gvansickle/ucg) or ripgrep and a silly test
+A Python 3 file grepper like UniversalCodeGrep [ucg](https://github.com/gvansickle/ucg)
 
 ## Design
 * Overview
