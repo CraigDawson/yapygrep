@@ -20,4 +20,7 @@ A Python 3 file grepper like UniversalCodeGrep [ucg](https://github.com/gvansick
 ## Interpreter
 * [pypy](https://pypy.org) if it works in PyQt5
 
+peter
 
+workspace_coursera/
+workspace_K1/
