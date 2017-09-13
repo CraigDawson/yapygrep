@@ -3,6 +3,12 @@
 A Python 3 file grepper like UniversalCodeGrep [ucg](https://github.com/gvansickle/ucg) or ripgrep and a silly test
 
 ## Design
+* Overview
+    * Text GUI with graphical options
+    * Multiprocessor
+    * Regex
+    * Dir/File tree searching
+
 * PyQt5 GUI
     * if cmdline argst then GUI pops-up and search runs (-g) else GUI starts and waits for user input
 
@@ -20,7 +26,3 @@ A Python 3 file grepper like UniversalCodeGrep [ucg](https://github.com/gvansick
 ## Interpreter
 * [pypy](https://pypy.org) if it works in PyQt5
 
-peter
-
-workspace_coursera/
-workspace_K1/
