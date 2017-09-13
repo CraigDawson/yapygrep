@@ -2,7 +2,6 @@
 
 A Python 3 file grepper like UniversalCodeGrep [ucg](https://github.com/gvansickle/ucg)
 
-
 ## Design
 * PyQt5 GUI
     * if cmdline argst then GUI pops-up and search runs (-g) else GUI starts and waits for user input
