@@ -14,7 +14,6 @@ A Python 3 file grepper like UniversalCodeGrep [ucg](https://github.com/gvansick
     * -g  => Go (run right away)
     * -t py => Type of files to look for
 
-
 ## Modules
 * regex
 
