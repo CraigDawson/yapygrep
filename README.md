@@ -1,6 +1,6 @@
 # yapygrep
 
-A Python 3 file grepper like UniversalCodeGrep [ucg](https://github.com/gvansickle/ucg) or 
+A Python 3 file grepper like UniversalCodeGrep [ucg](https://github.com/gvansickle/ucg) or [ripgrep](https://github.com/BurntSushi/ripgrep)
 
 ## Design
 * Overview
@@ -9,7 +9,7 @@ A Python 3 file grepper like UniversalCodeGrep [ucg](https://github.com/gvansick
     * Regex
     * Dir/File tree searching
 
-* PyQt5 GUI
+* [PyQt5](https://www.riverbankcomputing.com/news) GUI
     * if cmdline argst then GUI pops-up and search runs (-g) else GUI starts and waits for user input
 
 * Usage
