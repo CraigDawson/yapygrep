@@ -5,9 +5,9 @@ A Python 3 file grepper like UniversalCodeGrep [ucg](https://github.com/gvansick
 ## Design
 * Overview
     * Text GUI with graphical options
-    * Multiprocessor
-    * Regex
-    * Dir/File tree searching
+    * Multiprocessor  -- Craig
+    * Regex  -- Peter
+    * Dir/File tree searching -- Kevin
 
 * [PyQt5](https://www.riverbankcomputing.com/news) GUI
     * if cmdline argst then GUI pops-up and search runs (-g) else GUI starts and waits for user input
