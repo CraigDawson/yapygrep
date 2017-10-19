@@ -34,13 +34,18 @@ def primes(n):
 if __name__ == '__main__':
     numbers = [16000, 14000, 12000, 10000, 8000, 7000, 6000, 5000, 4000, 3000, 2000]
 
+    numbers[:] = [x / 5 for x in numbers]
+
     numnums = len(numbers)
     print('Number of numbers: {}'.format(numnums))
+
     cpus = cpu_count()
     print('{} CPUs'.format(cpus))
+
     start = time()
     pool = ProcessPoolExecutor(max_workers=cpus)
     results = list(pool.map(primes, numbers))
     print(results)
     end = time()
+
     print('Took %.3f seconds' % (end - start))
