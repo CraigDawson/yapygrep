@@ -7,6 +7,15 @@ from time import time
 import os
 
 
+def doFiles(files):
+    """
+    Processes list files
+    :param files: list of files to process
+    :return: None
+    """
+    pass
+
+
 def doDir(dir):
     """
     Processes a directory
@@ -39,16 +48,12 @@ def printDirs(dir):
         print('f - {}/{}'.format(dir, f))
 
 
-
-def doFiles(files):
-    """
-    Processes list files
-    :param files: list of files to process
-    :return: None
-    """
-    pass
-
-
 if __name__ == '__main__':
-    printDirs('.')
-
+    # printDirs('.')
+    dirs = ['.']
+    with ProcessPoolExecutor(max_workers=4) as executor:
+        for dir in dirs:
+            future = executor.submit(doDir, dir)
+            (more_dirs, files) = future.result()
+            dirs.extend(more_dirs)
+            print(files)
