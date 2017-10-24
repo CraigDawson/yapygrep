@@ -16,7 +16,7 @@ def doFiles(files, dir):
     :return: None
     """
     for file in files:
-        f = dir + '/' + file
+        f = dir + os.sep + file
         # print('f - {}'.format(f))
         print('{}  {}'.format(hashlib.md5(open(f, 'rb').read()).hexdigest(), f))
 
@@ -30,10 +30,10 @@ def doDir(dir):
     files = []
     dirs = []
     for entry in os.listdir(dir):
-        if os.path.isfile(dir + '/' + entry):
+        if os.path.isfile(dir + os.sep + entry):
             files.append(entry)
-        elif os.path.isdir(dir + '/' + entry):
-            dirs.append(dir + '/' + entry)
+        elif os.path.isdir(dir + os.sep + entry):
+            dirs.append(dir + os.sep + entry)
         else:
             print('{} is not a file or directory.'.format(entry))
     return (dirs, files)
@@ -50,7 +50,7 @@ def printDirs(dir):
         print('d - {}'.format(d))
         printDirs(d)
     for f in files:
-        print('f - {}/{}'.format(dir, f))
+        print('f - {}{}{}'.format(dir, os.sep, f))
 
 
 if __name__ == '__main__':
