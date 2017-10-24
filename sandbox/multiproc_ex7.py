@@ -5,15 +5,20 @@ from concurrent.futures import ProcessPoolExecutor
 from multiprocessing import current_process, cpu_count
 from time import time
 import os
+import hashlib
 
 
-def doFiles(files):
+def doFiles(files, dir):
     """
     Processes list files
     :param files: list of files to process
+    :param dir: directory files are in
     :return: None
     """
-    pass
+    for file in files:
+        f = dir + '/' + file
+        # print('f - {}'.format(f))
+        print('{}  {}'.format(hashlib.md5(open(f, 'rb').read()).hexdigest(), f))
 
 
 def doDir(dir):
@@ -54,6 +59,8 @@ if __name__ == '__main__':
     with ProcessPoolExecutor(max_workers=4) as executor:
         for dir in dirs:
             future = executor.submit(doDir, dir)
+
             (more_dirs, files) = future.result()
             dirs.extend(more_dirs)
-            print(files)
+
+            executor.submit(doFiles, files, dir)
