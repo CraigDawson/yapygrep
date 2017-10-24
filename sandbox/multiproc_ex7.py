@@ -2,8 +2,6 @@
 # Has simple dir and file functions
 
 from concurrent.futures import ProcessPoolExecutor
-from multiprocessing import current_process, cpu_count
-from time import time
 import os
 import hashlib
 
@@ -36,7 +34,7 @@ def doDir(dir):
             dirs.append(dir + os.sep + entry)
         else:
             print('{} is not a file or directory.'.format(entry))
-    return (dirs, files)
+    return dirs, files
 
 
 def printDirs(dir):
