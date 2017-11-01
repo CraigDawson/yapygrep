@@ -17,6 +17,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
 
         self.actionQuit.triggered.connect(self.exitCall)
         self.actionGo.triggered.connect(self.search)
+        self.pushButton.clicked.connect(self.search)
 
     def search(self):
         self.statusbar.showMessage('Searching . . .')
