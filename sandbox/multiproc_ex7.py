@@ -3,7 +3,7 @@
 
 from concurrent.futures import ProcessPoolExecutor
 import os
-import hashlib
+import re
 
 
 def doFiles(files, dir):
@@ -14,10 +14,13 @@ def doFiles(files, dir):
     :return: None
     """
     for file in files:
-        f = dir + os.sep + file
-        # print('f - {}'.format(f))
-        print('{}  {}'.format(hashlib.md5(open(f, 'rb').read()).hexdigest(), f))
+        path = dir + os.sep + file
+        print('{}:'.format(path))
+        f = open(path, "r")
 
+        for num, line in enumerate(f):
+             if re.search('for ', line):
+                 print('{}\t{}'.format(num, line), end='')
 
 def doDir(dir):
     """
