@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QLineEdit" name="lineEdit">
       <property name="text">
-       <string>File pattern</string>
+       <string>Directory pattern</string>
       </property>
      </widget>
     </item>

@@ -1,10 +1,11 @@
 import sys
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QAction, qApp
+from PyQt5.QtWidgets import QAction, qApp, QApplication
 from PyQt5.QtGui import QIcon
 from yapgrep_gui import Ui_MainWindow
 import os
 from os.path import join, getsize
+import glob
 
 
 class YapgrepGuiProgram(Ui_MainWindow):
@@ -23,24 +24,35 @@ class YapgrepGuiProgram(Ui_MainWindow):
 
     def search(self):
         self.statusbar.showMessage('Searching . . .')
-        print('Searching...')
-        self.dirWalk("..")
+        self.plainTextEdit.clear()
+        directory = self.lineEdit.text()
+        print('Directory from user:', directory)
+        for d in glob.glob(directory):
+            self.dirWalk(d)
+        self.statusbar.showMessage('Searching completed.')
+
         
     def dirWalk(self, directory):
         print('dir: ' + directory)
         try:
             for root, dirs, files in os.walk(directory):
                 print(root)
-                print('Dirs: ')
-                print(dirs)
-                print('Files: {}'.format(files))
-                print(root, "consumes", end=" ")
-                print(sum(getsize(join(root, name)) for name in files), end=" ")
-                print("bytes in", len(files), "non-directory files")
+                # print('Dirs: ')
+                # print(dirs)
+                # print('Files: {}'.format(files))
+                # print(root, "consumes", end=" ")
+                # print("bytes in", len(files), "non-directory files")
+                # print(sum(getsize(join(root, name)) for name in files), end=" ")
+
+                for name in files:
+                    self.plainTextEdit.appendPlainText(join(root, name))
+                    QApplication.instance().processEvents()
+                    
                 if '.git' in dirs:
-                    dirs.remove('.git')  # don't visit CVS directories
+                    dirs.remove('.git')  # don't visit git directories
+                    
         except:
-            print ("any error!")
+            print ("some error occurred!", sys.exc_info()[0])
             
     def exitCall(self):
         self.statusbar.showMessage('Exit app')

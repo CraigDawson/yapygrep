@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'yapgrep.ui'
 #
-# Created by: PyQt5 UI code generator 5.5.1
+# Created by: PyQt5 UI code generator 5.7
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -60,21 +60,11 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.lineEdit.setText(_translate("MainWindow", "File pattern"))
+        self.lineEdit.setText(_translate("MainWindow", "Directory pattern"))
         self.lineEdit_2.setText(_translate("MainWindow", "Search pattern"))
         self.pushButton.setText(_translate("MainWindow", "&Search"))
         self.menuFile.setTitle(_translate("MainWindow", "&File"))
         self.menuFind.setTitle(_translate("MainWindow", "F&ind"))
         self.actionQuit.setText(_translate("MainWindow", "&Quit"))
         self.actionGo.setText(_translate("MainWindow", "&Search"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
 
