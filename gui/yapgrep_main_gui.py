@@ -28,7 +28,11 @@ class YapgrepGuiProgram(Ui_MainWindow):
         directory = self.lineEdit.text()
         print('Directory from user:', directory)
         for d in glob.glob(directory):
-            self.dirWalk(d)
+            if os.path.isdir(d):
+                self.dirWalk(d)
+            else:
+                self.plainTextEdit.appendPlainText(d)
+                QApplication.instance().processEvents()
         self.statusbar.showMessage('Searching completed.')
 
         
