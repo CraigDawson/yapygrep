@@ -26,10 +26,13 @@ def main():
         fs = os.path.expandvars(fs)
         dbg('fs/expandvars', fs)
 
-        # glob supports '[rng]' and '[!rng]' too
-        if '*' not in fs and '?' not in fs:
-            dbg('fs', 'no special chars, adding "/**"')
+        if os.path.isdir(fs):
+            dbg('fs', 'adding "/**" to dir')
             fs += '/**'
+
+        # Not dir and no wildcard at end then append '**' ???
+        if not fs.endswith('*'):
+            fs += '**'
 
         base = os.path.basename(fs)
         dbg('base', base)
