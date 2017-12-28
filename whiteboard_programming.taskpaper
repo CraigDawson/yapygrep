@@ -1,0 +1,12 @@
+Whiteboard Programming Notes:
+
+    12/27/2017 Homework:
+        - glob.glob vs os.walk
+        - os.path.expanduser()
+        - os.path.dirname() -> os.walk()
+        - os.path.basename() -> glob.glob()
+        - walk and glob append to file grep list
+        - make a small py program with above
+
+    Other:
+	- .gitignore file for project
