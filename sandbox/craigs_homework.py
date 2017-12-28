@@ -39,7 +39,9 @@ def main():
 
         for p in glob.iglob(fs, recursive=True):
             if os.path.isfile(p):
-                dbg('file:', p)
+                dbg('file', p)
+
+        dbg('Final fs', fs)
 
     except IndexError:
         sys.exit('Usage: {} filespec'.format(sys.argv[0]))
