@@ -29,9 +29,8 @@ def main():
         if os.path.isdir(fs):
             dbg('fs', 'adding "/**" to dir')
             fs += '/**'
-
         # Not dir and no wildcard at end then append '**' ???
-        if not fs.endswith('*'):
+        elif not fs.endswith('*'):
             fs += '**'
 
         base = os.path.basename(fs)
@@ -52,3 +51,9 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# Test vectors:
+#./craigs_homework.py '$HOME/*/py'
+#./craigs_homework.py '$HOME/*/py/*.t?t'
+#./craigs_homework.py '~'
+#./craigs_homework.py ..
