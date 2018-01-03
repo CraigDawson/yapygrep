@@ -45,6 +45,8 @@ def walkDir(fileSpec, pattern):
 
 
 def grepFile(fileName, pattern):
+    ''' TODO: save output into buffer and return buffer then in calling 
+              function, print file name and buffer '''
     with open(fileName, 'r') as f:
         try:
             for i, line in enumerate(f):
@@ -56,13 +58,16 @@ def grepFile(fileName, pattern):
 def main():
     try:
         fs = sys.argv[1]
-        dbg('fs', fs)
+        pat = sys.argv[2]
 
-        pattern = regex.compile(r'.*with')
+        dbg('fs', fs)
+        dbg('pat', pat)
+
+        pattern = regex.compile(pat)
         walkDir(fs, pattern)
 
     except IndexError:
-        sys.exit('Usage: {} filespec'.format(sys.argv[0]))
+        sys.exit('Usage: {} filespec pattern'.format(sys.argv[0]))
 
 
 if __name__ == '__main__':
