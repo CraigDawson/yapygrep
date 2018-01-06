@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Created : Wed 27 Dec 2017 08:21:59 PM EST
-# Modified: Thu 28 Dec 2017 12:20:35 AM EST
+# Modified: Sat 06 Jan 2018 05:37:38 PM EST
 
 from __future__ import print_function
 
@@ -38,22 +38,27 @@ def walkDir(fileSpec, pattern):
 
     for p in glob.iglob(fs, recursive=True):
         if os.path.isfile(p):
-            dbg('file', p)
-            grepFile(p, pattern)
+            buf = grepFile(p, pattern)
+            if buf:
+                dbg('file', p)
+                print("".join(buf))
 
     dbg('Final fs', fs)
 
 
 def grepFile(fileName, pattern):
-    ''' TODO: save output into buffer and return buffer then in calling 
+    ''' TODO: save output into buffer and return buffer then in calling
               function, print file name and buffer '''
+    buf = []
     with open(fileName, 'r') as f:
         try:
             for i, line in enumerate(f):
                 if pattern.match(line):
-                    print("  ", i, line, end='')
+                    #print("  ", i, line, end='')
+                    buf.append('{} {}'.format(i, line))
         except UnicodeDecodeError:
             pass
+    return buf
 
 def main():
     try:
