@@ -55,7 +55,7 @@ def grepFile(fileName, pattern):
             for i, line in enumerate(f):
                 if pattern.match(line):
                     #print("  ", i, line, end='')
-                    buf.append('{} {}'.format(i, line))
+                    buf.append('    {}:{}'.format(i, line))
         except UnicodeDecodeError:
             pass
     return buf
