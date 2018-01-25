@@ -6,6 +6,8 @@ from yapgrep_gui import Ui_MainWindow
 import os
 from os.path import join, getsize
 import glob
+import regex
+import time
 
 
 class YapgrepGuiProgram(Ui_MainWindow):
@@ -23,41 +25,72 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.pushButton.clicked.connect(self.search)
 
     def search(self):
+        self.files = 0
+        self.matches = 0
         self.statusbar.showMessage('Searching . . .')
         self.plainTextEdit.clear()
         directory = self.lineEdit.text()
         print('Directory from user:', directory)
-        for d in glob.glob(directory):
-            if os.path.isdir(d):
-                self.dirWalk(d)
-            else:
-                self.plainTextEdit.appendPlainText(d)
-                QApplication.instance().processEvents()
+        try:
+            self.wd(directory,regex.compile("for"))
+        except:
+            print ("some error occurred!", sys.exc_info())
+        
         self.statusbar.showMessage('Searching completed.')
 
+    def dbg(self, prefix, item):
+        print(prefix + ':', item)
         
-    def dirWalk(self, directory):
-        print('dir: ' + directory)
-        try:
-            for root, dirs, files in os.walk(directory):
-                print(root)
-                # print('Dirs: ')
-                # print(dirs)
-                # print('Files: {}'.format(files))
-                # print(root, "consumes", end=" ")
-                # print("bytes in", len(files), "non-directory files")
-                # print(sum(getsize(join(root, name)) for name in files), end=" ")
+    def wd(self, fileSpec, pattern):
+        fs = os.path.expanduser(fileSpec)
+        self.dbg('fs/expanduser', fs)
 
-                for name in files:
-                    self.plainTextEdit.appendPlainText(join(root, name))
-                    QApplication.instance().processEvents()
-                    
-                if '.git' in dirs:
-                    dirs.remove('.git')  # don't visit git directories
-                    
-        except:
-            print ("some error occurred!", sys.exc_info()[0])
-            
+        fs = os.path.expandvars(fs)
+        self.dbg('fs/expandvars', fs)
+
+        if os.path.isdir(fs):
+            self.dbg('fs', 'adding "/**" to dir')
+            fs += '/**'
+        # Not dir and no wildcard at end then append '**' ???
+        #elif not fs.endswith('*'):
+        #    fs += '**'
+
+        base = os.path.basename(fs)
+        self.dbg('base', base)
+
+        path = os.path.dirname(fs)
+        self.dbg('path', path)
+
+        for p in glob.iglob(fs, recursive=True):
+            if os.path.isfile(p):
+                buf = self.grepFile(p, pattern)
+                if buf:
+                    self.dbg('file', p)
+                    print("".join(buf))
+
+        self.dbg('Final fs', fs)
+        print('Files searched: {}, Matches found: {}'.format(self.files, self.matches))
+
+
+    def grepFile(self, fileName, pattern):
+        ''' TODO: save output into buffer and return buffer then in calling
+              function, print file name and buffer '''
+        buf = []
+        with open(fileName, 'r') as f:
+            try:
+                self.files += 1
+                self.statusbar.showMessage(fileName)
+                #time.sleep(1)
+                for i, line in enumerate(f):
+                    if pattern.match(line):
+                        self.matches += 1
+                        buf.append('    {}:{}'.format(i, line))
+            except UnicodeDecodeError:
+                pass
+        return buf
+
+
+ 
     def exitCall(self):
         self.statusbar.showMessage('Exit app')
         qApp.quit()
