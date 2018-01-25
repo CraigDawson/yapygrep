@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Created : Wed 27 Dec 2017 08:21:59 PM EST
-# Modified: Sat 06 Jan 2018 05:37:38 PM EST
+# Modified: Thu 25 Jan 2018 12:06:36 AM EST
 
 from __future__ import print_function
 
@@ -11,6 +11,8 @@ import os.path
 import glob
 import regex
 
+files = 0
+matches = 0
 
 def dbg(prefix, item):
     print(prefix + ':', item)
@@ -44,18 +46,26 @@ def walkDir(fileSpec, pattern):
                 print("".join(buf))
 
     dbg('Final fs', fs)
+    global files
+    global matches
+    dbg('Files', files)
+    dbg('Matches', matches)
 
 
 def grepFile(fileName, pattern):
     ''' TODO: save output into buffer and return buffer then in calling
               function, print file name and buffer '''
+    global files
+    global matches
     buf = []
     with open(fileName, 'r') as f:
         try:
+            files += 1
             for i, line in enumerate(f):
-                if pattern.match(line):
+                if pattern.search(line):
+                    matches += 1
                     #print("  ", i, line, end='')
-                    buf.append('{} {}'.format(i, line))
+                    buf.append('    {}:\t{}'.format(i, line))
         except UnicodeDecodeError:
             pass
     return buf
