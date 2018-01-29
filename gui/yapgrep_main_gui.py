@@ -7,18 +7,25 @@ import os
 from os.path import join, getsize
 import glob
 import regex
-import time
+from timeit import default_timer as timer
 
 
 class YapgrepGuiProgram(Ui_MainWindow):
     def __init__(self, MainWindow):
         super().__init__()
 
+        self.version = 0.5
+
         self.setupUi(MainWindow)
 
-        self.statusbar.showMessage('__init__')
+        self.statusbar.showMessage('ready')
 
-        self.plainTextEdit.appendPlainText('The quick brown fox jumped over the lazy dogs back')
+        f = self.plainTextEdit.font()
+        f.setFamily("Courier New")
+        f.setPointSize(18)
+        self.plainTextEdit.setFont(f)
+
+        self.plainTextEdit.appendPlainText('yapgrep {}'.format(self.version))
 
         self.actionQuit.triggered.connect(self.exitCall)
         self.actionGo.triggered.connect(self.search)
@@ -30,18 +37,22 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.statusbar.showMessage('Searching . . .')
         self.plainTextEdit.clear()
         directory = self.lineEdit.text()
+        pattern = self.lineEdit_2.text()
+        reg = regex.compile(pattern)
+        self.start = timer()
         print('Directory from user:', directory)
         try:
-            self.wd(directory,regex.compile("for"))
+            self.walkDirs(directory, reg)
         except:
             print ("some error occurred!", sys.exc_info())
-        
+        self.end = timer()
+        self.plainTextEdit.appendPlainText('Time: {:.2f}'.format(self.end - self.start))
         self.statusbar.showMessage('Searching completed.')
 
     def dbg(self, prefix, item):
         print(prefix + ':', item)
-        
-    def wd(self, fileSpec, pattern):
+
+    def walkDirs(self, fileSpec, pattern):
         fs = os.path.expanduser(fileSpec)
         self.dbg('fs/expanduser', fs)
 
@@ -51,9 +62,6 @@ class YapgrepGuiProgram(Ui_MainWindow):
         if os.path.isdir(fs):
             self.dbg('fs', 'adding "/**" to dir')
             fs += '/**'
-        # Not dir and no wildcard at end then append '**' ???
-        #elif not fs.endswith('*'):
-        #    fs += '**'
 
         base = os.path.basename(fs)
         self.dbg('base', base)
@@ -65,24 +73,24 @@ class YapgrepGuiProgram(Ui_MainWindow):
             if os.path.isfile(p):
                 buf = self.grepFile(p, pattern)
                 if buf:
-                    self.dbg('file', p)
-                    print("".join(buf))
+                    self.plainTextEdit.appendPlainText('file: {}'.format(p))
+                    self.plainTextEdit.appendPlainText("".join(buf))
 
         self.dbg('Final fs', fs)
+        self.plainTextEdit.appendPlainText('Files searched: {}, Matches found: {}'.format(self.files, self.matches))
         print('Files searched: {}, Matches found: {}'.format(self.files, self.matches))
 
 
     def grepFile(self, fileName, pattern):
-        ''' TODO: save output into buffer and return buffer then in calling
-              function, print file name and buffer '''
+        global app
         buf = []
         with open(fileName, 'r') as f:
             try:
                 self.files += 1
                 self.statusbar.showMessage(fileName)
-                #time.sleep(1)
+                app.processEvents()
                 for i, line in enumerate(f):
-                    if pattern.match(line):
+                    if pattern.search(line):
                         self.matches += 1
                         buf.append('    {}:{}'.format(i, line))
             except UnicodeDecodeError:
@@ -90,7 +98,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
         return buf
 
 
- 
+
     def exitCall(self):
         self.statusbar.showMessage('Exit app')
         qApp.quit()
