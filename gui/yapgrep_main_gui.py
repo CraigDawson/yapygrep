@@ -1,6 +1,6 @@
 import sys
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QAction, qApp, QApplication
+from PyQt5.QtWidgets import QAction, qApp, QApplication, QMessageBox
 from PyQt5.QtGui import QIcon
 from yapgrep_gui import Ui_MainWindow
 import os
@@ -30,7 +30,18 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.actionQuit.triggered.connect(self.exitCall)
         self.actionGo.triggered.connect(self.search)
         self.pushButton.clicked.connect(self.search)
+        self.actionAbout.triggered.connect(self.about)
 
+    def about(self):
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Information)
+        msg.setText("Yapygrep " + str(self.version))
+#        msg.setInformativeText("This is additional information")
+        msg.setWindowTitle("About")
+#        msg.setDetailedText("The details are as follows:")
+
+        msg.exec_()
+        
     def search(self):
         self.files = 0
         self.matches = 0
