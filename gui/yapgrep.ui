@@ -81,8 +81,16 @@
     </property>
     <addaction name="actionAbout"/>
    </widget>
+   <widget class="QMenu" name="menuSettings">
+    <property name="title">
+     <string>Setti&amp;ngs</string>
+    </property>
+    <addaction name="actionCommon"/>
+    <addaction name="actionAdvanced"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuFind"/>
+   <addaction name="menuSettings"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar">
@@ -103,6 +111,16 @@
   <action name="actionAbout">
    <property name="text">
     <string>&amp;About</string>
+   </property>
+  </action>
+  <action name="actionCommon">
+   <property name="text">
+    <string>&amp;Common</string>
+   </property>
+  </action>
+  <action name="actionAdvanced">
+   <property name="text">
+    <string>Ad&amp;vanced</string>
    </property>
   </action>
  </widget>

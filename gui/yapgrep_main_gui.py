@@ -30,6 +30,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.actionQuit.triggered.connect(self.exitCall)
         self.actionGo.triggered.connect(self.search)
         self.pushButton.clicked.connect(self.search)
+        
         self.actionAbout.triggered.connect(self.about)
 
     def about(self):
