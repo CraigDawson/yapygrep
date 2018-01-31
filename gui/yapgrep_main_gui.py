@@ -17,7 +17,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
 
         self.version = 0.5
         self.recursive = True
-        
+
         self.setupUi(MainWindow)
 
         self.Common = QDialog()
@@ -41,7 +41,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
 
     def common_settings(self):
         self.Common.exec_()
-        
+
     def about(self):
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Information)
@@ -51,7 +51,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
 #        msg.setDetailedText("The details are as follows:")
 
         msg.exec_()
-        
+
     def search(self):
         self.files = 0
         self.matches = 0
@@ -90,7 +90,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
         path = os.path.dirname(fs)
         self.dbg('path', path)
 
-        for p in glob.iglob(fs, self.recursive):
+        for p in glob.iglob(fs, recursive=self.recursive):
             if os.path.isfile(p):
                 buf = self.grepFile(p, pattern)
                 if buf:
