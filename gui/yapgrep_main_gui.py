@@ -1,8 +1,9 @@
 import sys
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QAction, qApp, QApplication, QMessageBox
+from PyQt5.QtWidgets import QAction, qApp, QApplication, QMessageBox, QDialog
 from PyQt5.QtGui import QIcon
 from yapgrep_gui import Ui_MainWindow
+from yapgrep_common_gui import Ui_Common
 import os
 from os.path import join, getsize
 import glob
@@ -15,8 +16,13 @@ class YapgrepGuiProgram(Ui_MainWindow):
         super().__init__()
 
         self.version = 0.5
-
+        self.recursive = True
+        
         self.setupUi(MainWindow)
+
+        self.Common = QDialog()
+        self.ui2 = Ui_Common()
+        self.ui2.setupUi(self.Common)
 
         self.statusbar.showMessage('ready')
 
@@ -30,9 +36,12 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.actionQuit.triggered.connect(self.exitCall)
         self.actionGo.triggered.connect(self.search)
         self.pushButton.clicked.connect(self.search)
-        
+        self.actionCommon.triggered.connect(self.common_settings)
         self.actionAbout.triggered.connect(self.about)
 
+    def common_settings(self):
+        self.Common.exec_()
+        
     def about(self):
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Information)
@@ -81,7 +90,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
         path = os.path.dirname(fs)
         self.dbg('path', path)
 
-        for p in glob.iglob(fs, recursive=True):
+        for p in glob.iglob(fs, self.recursive):
             if os.path.isfile(p):
                 buf = self.grepFile(p, pattern)
                 if buf:
