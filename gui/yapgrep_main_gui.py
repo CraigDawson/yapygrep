@@ -80,15 +80,18 @@ class YapgrepGuiProgram(Ui_MainWindow):
         fs = os.path.expandvars(fs)
         self.dbg('fs/expandvars', fs)
 
-        if os.path.isdir(fs):
-            self.dbg('fs', 'adding "/**" to dir')
-            fs += '/**'
-
         base = os.path.basename(fs)
         self.dbg('base', base)
 
         path = os.path.dirname(fs)
         self.dbg('path', path)
+
+        if os.path.isdir(fs):
+            fs += '/**'
+        elif os.path.isdir(path):
+            fs = path + '/**/' + base
+
+        self.dbg('fs', fs)
 
         for p in glob.iglob(fs, recursive=self.recursive):
             if os.path.isfile(p):
@@ -104,12 +107,12 @@ class YapgrepGuiProgram(Ui_MainWindow):
 
     def grepFile(self, fileName, pattern):
         global app
+        self.statusbar.showMessage(fileName)
+        app.processEvents()
         buf = []
         with open(fileName, 'r') as f:
             try:
                 self.files += 1
-                self.statusbar.showMessage(fileName)
-                app.processEvents()
                 for i, line in enumerate(f):
                     if pattern.search(line):
                         self.matches += 1
