@@ -16,24 +16,24 @@ class YapgrepGuiProgram(Ui_MainWindow):
         super().__init__()
 
         self.version = 0.5
-  
+
         self.setupUi(MainWindow)
 
         self.Common = QDialog()
         self.ui2 = Ui_Common()
         self.ui2.setupUi(self.Common)
-        
+
         self.recursive = True
         self.ui2.checkBox.setChecked(self.recursive)
 
         self.statusbar.showMessage('ready')
 
-        f = self.plainTextEdit.font()
+        f = self.textEdit.font()
         f.setFamily("Courier New")
         f.setPointSize(18)
-        self.plainTextEdit.setFont(f)
+        self.textEdit.setFont(f)
 
-        self.plainTextEdit.append('yapgrep {}'.format(self.version))
+        self.textEdit.append('yapgrep {}'.format(self.version))
 
         self.actionQuit.triggered.connect(self.exitCall)
         self.actionGo.triggered.connect(self.search)
@@ -59,7 +59,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.files = 0
         self.matches = 0
         self.statusbar.showMessage('Searching . . .')
-        self.plainTextEdit.clear()
+        self.textEdit.clear()
         directory = self.lineEdit.text()
         pattern = self.lineEdit_2.text()
         pattern = '(' + pattern + ')'
@@ -71,7 +71,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
         except:
             print ("some error occurred!", sys.exc_info())
         self.end = timer()
-        self.plainTextEdit.append('Time: {:.2f}'.format(self.end - self.start))
+        self.textEdit.append('Time: {:.2f}'.format(self.end - self.start))
         self.statusbar.showMessage('Searching completed.')
 
     def dbg(self, prefix, item):
@@ -102,11 +102,11 @@ class YapgrepGuiProgram(Ui_MainWindow):
             if os.path.isfile(p):
                 buf = self.grepFile(p, pattern)
                 if buf:
-                    self.plainTextEdit.append('file: {}'.format(p))
-                    self.plainTextEdit.append("".join(buf))
+                    self.textEdit.append('file: {}'.format(p))
+                    self.textEdit.append("".join(buf))
 
         self.dbg('Final fs', fs)
-        self.plainTextEdit.append('Files searched: {}, Matches found: {}'.format(self.files, self.matches))
+        self.textEdit.append('Files searched: {}, Matches found: {}'.format(self.files, self.matches))
         print('Files searched: {}, Matches found: {}'.format(self.files, self.matches))
 
 
@@ -122,7 +122,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
                     if pattern.search(line):
                         self.matches += 1
                         newLine = regex.sub(pattern, r'<font color="red"><b>\1</b></font>', line)
-                        buf.append('    {}:{}<br>'.format('<font color="blue">'+str(i)+'</font>', newLine))
+                        buf.append('&nbsp;&nbsp;&nbsp;&nbsp;{}:{}<br>'.format('<font color="blue">'+str(i)+'</font>', newLine))
             except UnicodeDecodeError:
                 pass
         return buf
