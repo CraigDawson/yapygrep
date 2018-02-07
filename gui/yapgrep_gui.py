@@ -22,7 +22,7 @@ class Ui_MainWindow(object):
         self.lineEdit_2 = QtWidgets.QLineEdit(self.centralwidget)
         self.lineEdit_2.setObjectName("lineEdit_2")
         self.gridLayout.addWidget(self.lineEdit_2, 1, 0, 1, 1)
-        self.plainTextEdit = QtWidgets.QPlainTextEdit(self.centralwidget)
+        self.plainTextEdit = QtWidgets.QTextEdit(self.centralwidget)
         self.plainTextEdit.setReadOnly(True)
         self.plainTextEdit.setObjectName("plainTextEdit")
         self.gridLayout.addWidget(self.plainTextEdit, 2, 0, 1, 1)

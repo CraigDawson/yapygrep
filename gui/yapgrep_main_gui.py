@@ -16,13 +16,15 @@ class YapgrepGuiProgram(Ui_MainWindow):
         super().__init__()
 
         self.version = 0.5
-        self.recursive = True
-
+  
         self.setupUi(MainWindow)
 
         self.Common = QDialog()
         self.ui2 = Ui_Common()
         self.ui2.setupUi(self.Common)
+        
+        self.recursive = True
+        self.ui2.checkBox.setChecked(self.recursive)
 
         self.statusbar.showMessage('ready')
 
@@ -31,7 +33,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
         f.setPointSize(18)
         self.plainTextEdit.setFont(f)
 
-        self.plainTextEdit.appendPlainText('yapgrep {}'.format(self.version))
+        self.plainTextEdit.append('yapgrep {}'.format(self.version))
 
         self.actionQuit.triggered.connect(self.exitCall)
         self.actionGo.triggered.connect(self.search)
@@ -41,6 +43,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
 
     def common_settings(self):
         self.Common.exec_()
+        self.recursive = self.ui2.checkBox.isChecked()
 
     def about(self):
         msg = QMessageBox()
@@ -59,6 +62,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.plainTextEdit.clear()
         directory = self.lineEdit.text()
         pattern = self.lineEdit_2.text()
+        pattern = '(' + pattern + ')'
         reg = regex.compile(pattern)
         self.start = timer()
         print('Directory from user:', directory)
@@ -67,7 +71,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
         except:
             print ("some error occurred!", sys.exc_info())
         self.end = timer()
-        self.plainTextEdit.appendPlainText('Time: {:.2f}'.format(self.end - self.start))
+        self.plainTextEdit.append('Time: {:.2f}'.format(self.end - self.start))
         self.statusbar.showMessage('Searching completed.')
 
     def dbg(self, prefix, item):
@@ -92,16 +96,17 @@ class YapgrepGuiProgram(Ui_MainWindow):
             fs = path + '/**/' + base
 
         self.dbg('fs', fs)
+        self.dbg('recursive', self.recursive)
 
         for p in glob.iglob(fs, recursive=self.recursive):
             if os.path.isfile(p):
                 buf = self.grepFile(p, pattern)
                 if buf:
-                    self.plainTextEdit.appendPlainText('file: {}'.format(p))
-                    self.plainTextEdit.appendPlainText("".join(buf))
+                    self.plainTextEdit.append('file: {}'.format(p))
+                    self.plainTextEdit.append("".join(buf))
 
         self.dbg('Final fs', fs)
-        self.plainTextEdit.appendPlainText('Files searched: {}, Matches found: {}'.format(self.files, self.matches))
+        self.plainTextEdit.append('Files searched: {}, Matches found: {}'.format(self.files, self.matches))
         print('Files searched: {}, Matches found: {}'.format(self.files, self.matches))
 
 
@@ -116,7 +121,8 @@ class YapgrepGuiProgram(Ui_MainWindow):
                 for i, line in enumerate(f):
                     if pattern.search(line):
                         self.matches += 1
-                        buf.append('    {}:{}'.format(i, line))
+                        newLine = regex.sub(pattern, r'<font color="red"><b>\1</b></font>', line)
+                        buf.append('    {}:{}<br>'.format('<font color="blue">'+str(i)+'</font>', newLine))
             except UnicodeDecodeError:
                 pass
         return buf
