@@ -9,6 +9,14 @@ from os.path import join, getsize
 import glob
 import regex
 from timeit import default_timer as timer
+from icecream import ic
+from datetime import datetime
+
+
+def unixTimestamp():
+    return '%s |> ' % datetime.now()
+
+ic.configureOutput(prefix=unixTimestamp)
 
 
 class YapgrepGuiProgram(Ui_MainWindow):
@@ -65,38 +73,35 @@ class YapgrepGuiProgram(Ui_MainWindow):
         pattern = '(' + pattern + ')'
         reg = regex.compile(pattern)
         self.start = timer()
-        print('Directory from user:', directory)
+        ic('Directory from user: {}'.format(directory))
         try:
             self.walkDirs(directory, reg)
         except:
-            print ("some error occurred!", sys.exc_info())
+            ic("Some error occurred!".join(sys.exc_info()))
         self.end = timer()
         self.textEdit.append('Time: {:.2f}'.format(self.end - self.start))
         self.statusbar.showMessage('Searching completed.')
 
-    def dbg(self, prefix, item):
-        print(prefix + ':', item)
-
     def walkDirs(self, fileSpec, pattern):
         fs = os.path.expanduser(fileSpec)
-        self.dbg('fs/expanduser', fs)
+        ic(fs)
 
         fs = os.path.expandvars(fs)
-        self.dbg('fs/expandvars', fs)
+        ic(fs)
 
         base = os.path.basename(fs)
-        self.dbg('base', base)
+        ic(base)
 
         path = os.path.dirname(fs)
-        self.dbg('path', path)
+        ic(path)
 
         if os.path.isdir(fs):
             fs += '/**'
         elif os.path.isdir(path):
             fs = path + '/**/' + base
 
-        self.dbg('fs', fs)
-        self.dbg('recursive', self.recursive)
+        ic(fs)
+        ic(self.recursive)
 
         for p in glob.iglob(fs, recursive=self.recursive):
             if os.path.isfile(p):
@@ -105,9 +110,9 @@ class YapgrepGuiProgram(Ui_MainWindow):
                     self.textEdit.append('file: {}'.format(p))
                     self.textEdit.append("".join(buf))
 
-        self.dbg('Final fs', fs)
+        ic(fs)
         self.textEdit.append('Files searched: {}, Matches found: {}'.format(self.files, self.matches))
-        print('Files searched: {}, Matches found: {}'.format(self.files, self.matches))
+        ic('Files searched: {}, Matches found: {}'.format(self.files, self.matches))
 
 
     def grepFile(self, fileName, pattern):
