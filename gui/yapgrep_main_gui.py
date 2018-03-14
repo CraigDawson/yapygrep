@@ -11,7 +11,7 @@ import regex
 from timeit import default_timer as timer
 from icecream import ic
 from datetime import datetime
-
+import argparse
 
 def unixTimestamp():
     return '%s |> ' % datetime.now()
@@ -31,7 +31,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.ui2 = Ui_Common()
         self.ui2.setupUi(self.Common)
 
-        self.recursive = True
+        self.recursive = False
         self.ui2.checkBox.setChecked(self.recursive)
 
         self.statusbar.showMessage('ready')
@@ -142,9 +142,17 @@ class YapgrepGuiProgram(Ui_MainWindow):
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
 
+    argparser = argparse.ArgumentParser()
+    argparser.add_argument("-R", "--recurse", help="recurse down the directory tree", action="store_true")
+    args = argparser.parse_args()
+    
     MainWindow = QtWidgets.QMainWindow()
 
     ui = YapgrepGuiProgram(MainWindow)
+
+    if args.recurse:
+        ui.recursive = True
+        ui.ui2.checkBox.setChecked(ui.recursive)
 
     MainWindow.show()
 
