@@ -1,5 +1,5 @@
 import sys
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QAction, qApp, QApplication, QMessageBox, QDialog
 from PyQt5.QtGui import QIcon
 from yapgrep_gui import Ui_MainWindow
@@ -31,7 +31,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.ui2 = Ui_Common()
         self.ui2.setupUi(self.Common)
 
-        self.recursive = False
+        self.recursive = True
         self.ui2.checkBox.setChecked(self.recursive)
 
         self.statusbar.showMessage('ready')
@@ -143,17 +143,25 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
 
     argparser = argparse.ArgumentParser()
-    argparser.add_argument("-R", "--recurse", help="recurse down the directory tree", action="store_true")
+    argparser.add_argument("-r", "-R", "--recurse", help="recurse down the directory tree", action="store_true")
+    argparser.add_argument("-n", "--no-recurse", help="don't recurse down the directory tree", action="store_false", dest="recurse")
+    argparser.add_argument("pattern")
+    argparser.add_argument("filedirs", nargs="+", type=list)  # How do we make this OPTIONAL??????
     args = argparser.parse_args()
-    
+
+    print(args.filedirs)
+          
     MainWindow = QtWidgets.QMainWindow()
 
     ui = YapgrepGuiProgram(MainWindow)
 
     if args.recurse:
-        ui.recursive = True
-        ui.ui2.checkBox.setChecked(ui.recursive)
+        ui.recursive = args.recurse
 
+    ui.ui2.checkBox.setChecked(ui.recursive)
+    ui.lineEdit.setText(QtCore.QCoreApplication.translate("MainWindow", ' '.join([''.join(args.filedirs[i]) for i in range(len(args.filedirs))])))
+    ui.lineEdit_2.setText(QtCore.QCoreApplication.translate("MainWindow", args.pattern))
+    
     MainWindow.show()
 
     sys.exit(app.exec_())
