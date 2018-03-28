@@ -72,14 +72,18 @@ class YapgrepGuiProgram(Ui_MainWindow):
         pattern = self.lineEdit_2.text()
         pattern = '(' + pattern + ')'
         reg = regex.compile(pattern)
-        self.start = timer()
-        ic('Directory from user: {}'.format(directory))
-        try:
-            self.walkDirs(directory, reg)
-        except:
-            ic("Some error occurred!".join(sys.exc_info()))
-        self.end = timer()
-        self.textEdit.append('Time: {:.2f}'.format(self.end - self.start))
+
+        for d in directory.split(':'):
+            self.start = timer()
+            ic('Directory from user: {}'.format(d))
+
+            try:
+                self.walkDirs(d, reg)
+            except:
+                ic("Some error occurred!".join(sys.exc_info()))
+            self.end = timer()
+            self.textEdit.append('Time: {:.2f}'.format(self.end - self.start))
+            
         self.statusbar.showMessage('Searching completed.')
 
     def walkDirs(self, fileSpec, pattern):
@@ -113,7 +117,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
         ic(fs)
         self.textEdit.append('Files searched: {}, Matches found: {}'.format(self.files, self.matches))
         ic('Files searched: {}, Matches found: {}'.format(self.files, self.matches))
-
+        self.files,self.matches = 0,0
 
     def grepFile(self, fileName, pattern):
         global app
@@ -145,11 +149,13 @@ if __name__ == '__main__':
     argparser = argparse.ArgumentParser()
     argparser.add_argument("-r", "-R", "--recurse", help="recurse down the directory tree", action="store_true", default=True)
     argparser.add_argument("-n", "--no-recurse", help="don't recurse down the directory tree", action="store_false", dest="recurse")
-    argparser.add_argument("pattern")
-    argparser.add_argument("filedirs", nargs="+", type=list)  # How do we make this OPTIONAL??????
+    argparser.add_argument("-g", "--go", help="implicitly push the search button", action="store_true")
+    
+    argparser.add_argument("pattern", nargs="?", default="")
+    argparser.add_argument("filedirs", nargs="*", default=[os.getcwd()])
     args = argparser.parse_args()
 
-    print(args.filedirs)
+    ic(args.filedirs)
 
     MainWindow = QtWidgets.QMainWindow()
 
@@ -160,9 +166,16 @@ if __name__ == '__main__':
     ui.recursive = args.recurse
 
     ui.ui2.checkBox.setChecked(ui.recursive)
-    ui.lineEdit.setText(QtCore.QCoreApplication.translate("MainWindow", ' '.join([''.join(args.filedirs[i]) for i in range(len(args.filedirs))])))
+    ui.lineEdit.setText(QtCore.QCoreApplication.translate("MainWindow", ':'.join(args.filedirs)))
     ui.lineEdit_2.setText(QtCore.QCoreApplication.translate("MainWindow", args.pattern))
 
     MainWindow.show()
+
+    
+    if args.go:
+        if len(args.pattern) > 0:
+            ui.search()
+        else:
+            ui.textEdit.append('<font color="red">No pattern specified</font>')
 
     sys.exit(app.exec_())
