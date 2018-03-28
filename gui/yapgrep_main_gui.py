@@ -143,25 +143,26 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
 
     argparser = argparse.ArgumentParser()
-    argparser.add_argument("-r", "-R", "--recurse", help="recurse down the directory tree", action="store_true")
+    argparser.add_argument("-r", "-R", "--recurse", help="recurse down the directory tree", action="store_true", default=True)
     argparser.add_argument("-n", "--no-recurse", help="don't recurse down the directory tree", action="store_false", dest="recurse")
     argparser.add_argument("pattern")
     argparser.add_argument("filedirs", nargs="+", type=list)  # How do we make this OPTIONAL??????
     args = argparser.parse_args()
 
     print(args.filedirs)
-          
+
     MainWindow = QtWidgets.QMainWindow()
 
     ui = YapgrepGuiProgram(MainWindow)
 
-    if args.recurse:
-        ui.recursive = args.recurse
+    ic(args)
+    ic(args.recurse)
+    ui.recursive = args.recurse
 
     ui.ui2.checkBox.setChecked(ui.recursive)
     ui.lineEdit.setText(QtCore.QCoreApplication.translate("MainWindow", ' '.join([''.join(args.filedirs[i]) for i in range(len(args.filedirs))])))
     ui.lineEdit_2.setText(QtCore.QCoreApplication.translate("MainWindow", args.pattern))
-    
+
     MainWindow.show()
 
     sys.exit(app.exec_())
