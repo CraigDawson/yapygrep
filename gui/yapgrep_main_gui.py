@@ -154,6 +154,7 @@ if __name__ == '__main__':
     argparser.add_argument("-r", "-R", "--recurse", help="recurse down the directory tree", action="store_true", default=True)
     argparser.add_argument("-n", "--no-recurse", help="don't recurse down the directory tree", action="store_false", dest="recurse")
     argparser.add_argument("-g", "--go", help="implicitly push the search button", action="store_true")
+    argparser.add_argument("-t", "--type", help="specify filetypes for search", dest="ftype")
 
     argparser.add_argument("pattern", nargs="?", default="")
     argparser.add_argument("filedirs", nargs="*", default=[os.getcwd()])
