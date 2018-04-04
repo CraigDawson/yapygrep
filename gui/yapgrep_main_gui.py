@@ -12,6 +12,8 @@ from timeit import default_timer as timer
 from icecream import ic
 from datetime import datetime
 import argparse
+import html
+
 
 def unixTimestamp():
     return '%s |> ' % datetime.now()
@@ -83,7 +85,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
                 ic("Some error occurred!".join(sys.exc_info()))
             self.end = timer()
             self.textEdit.append('Time: {:.2f}'.format(self.end - self.start))
-            
+
         self.statusbar.showMessage('Searching completed.')
 
     def walkDirs(self, fileSpec, pattern):
@@ -130,6 +132,8 @@ class YapgrepGuiProgram(Ui_MainWindow):
                 for i, line in enumerate(f):
                     if pattern.search(line):
                         self.matches += 1
+                        # escape HTML in line
+                        line = html.escape(line)
                         newLine = regex.sub(pattern, r'<font color="red"><b>\1</b></font>', line)
                         buf.append('&nbsp;&nbsp;&nbsp;&nbsp;{}:{}<br>'.format('<font color="blue">'+str(i)+'</font>', newLine))
             except UnicodeDecodeError:
@@ -150,7 +154,7 @@ if __name__ == '__main__':
     argparser.add_argument("-r", "-R", "--recurse", help="recurse down the directory tree", action="store_true", default=True)
     argparser.add_argument("-n", "--no-recurse", help="don't recurse down the directory tree", action="store_false", dest="recurse")
     argparser.add_argument("-g", "--go", help="implicitly push the search button", action="store_true")
-    
+
     argparser.add_argument("pattern", nargs="?", default="")
     argparser.add_argument("filedirs", nargs="*", default=[os.getcwd()])
     args = argparser.parse_args()
@@ -171,7 +175,7 @@ if __name__ == '__main__':
 
     MainWindow.show()
 
-    
+
     if args.go:
         if len(args.pattern) > 0:
             ui.search()
