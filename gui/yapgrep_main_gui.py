@@ -13,6 +13,7 @@ from icecream import ic
 from datetime import datetime
 import argparse
 import html
+import json
 
 
 def unixTimestamp():
@@ -176,6 +177,20 @@ if __name__ == '__main__':
 
     MainWindow.show()
 
+    # Read in valid types
+    with open('types.json', 'r') as f:
+        types = json.load(f)
+        # TODO add types to GUI
+        
+    # Find user selected type
+    if args.ftype is not None:
+        if args.ftype in types:
+            typeList = types[args.ftype]
+            ic(typeList)
+        else:
+            msg = 'User specified type not found: {}'.format(args.ftype)
+            ic(msg)
+            ui.textEdit.append('<font color="red">{}</font>'.format(msg))
 
     if args.go:
         if len(args.pattern) > 0:
