@@ -155,7 +155,7 @@ if __name__ == '__main__':
     argparser.add_argument("-r", "-R", "--recurse", help="recurse down the directory tree", action="store_true", default=True)
     argparser.add_argument("-n", "--no-recurse", help="don't recurse down the directory tree", action="store_false", dest="recurse")
     argparser.add_argument("-g", "--go", help="implicitly push the search button", action="store_true")
-    argparser.add_argument("-t", "--type", help="specify filetypes for search", dest="ftype")
+    argparser.add_argument("-t", "--type", help="specify filetypes for search", dest="ftype", nargs="+")
 
     argparser.add_argument("pattern", nargs="?", default="")
     argparser.add_argument("filedirs", nargs="*", default=[os.getcwd()])
@@ -184,13 +184,15 @@ if __name__ == '__main__':
         
     # Find user selected type
     if args.ftype is not None:
-        if args.ftype in types:
-            typeList = types[args.ftype]
-            ic(typeList)
-        else:
-            msg = 'User specified type not found: {}'.format(args.ftype)
-            ic(msg)
-            ui.textEdit.append('<font color="red">{}</font>'.format(msg))
+        typeList = []
+        for t in args.ftype: 
+            if t in types:
+                typeList += types[t]
+                ic(typeList)
+            else:
+                msg = 'User specified type not found: {}'.format(t)
+                ic(msg)
+                ui.textEdit.append('<font color="red">{}</font>'.format(msg))
 
     if args.go:
         if len(args.pattern) > 0:
