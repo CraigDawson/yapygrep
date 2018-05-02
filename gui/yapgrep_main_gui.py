@@ -1,6 +1,6 @@
 import sys
-from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtWidgets import qApp, QMessageBox, QDialog
+from PyQt5 import QtWidgets, QtCore, Qt
+from PyQt5.QtWidgets import qApp, QMessageBox, QDialog, QListWidget, QListWidgetItem
 from yapgrep_gui import Ui_MainWindow
 from yapgrep_common_gui import Ui_Common
 import os
@@ -189,14 +189,22 @@ if __name__ == '__main__':
     # Read in valid types
     with open('types.json', 'r') as f:
         types = json.load(f)
-        # TODO add types to GUI
 
+        for t in types:
+            wi = QListWidgetItem(t)
+            wi.setCheckState(False)
+            ui.ui2.listWidget.addItem(wi)
+            
     # Find user selected type
     if args.ftype is not None:
         for t in args.ftype:
             if t in types:
                 ui.typeList += types[t]
                 ic(ui.typeList)
+                item = ui.ui2.listWidget.findItems(t, QtCore.Qt.MatchExactly)
+                
+                if item:
+                    item[0].setCheckState(True)
             else:
                 msg = 'User specified type not found: {}'.format(t)
                 ic(msg)
