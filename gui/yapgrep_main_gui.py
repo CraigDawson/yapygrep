@@ -1,11 +1,9 @@
 import sys
 from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtWidgets import QAction, qApp, QApplication, QMessageBox, QDialog
-from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import qApp, QMessageBox, QDialog
 from yapgrep_gui import Ui_MainWindow
 from yapgrep_common_gui import Ui_Common
 import os
-from os.path import join, getsize
 import glob
 import regex
 from timeit import default_timer as timer
@@ -38,6 +36,8 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.ui2.checkBox.setChecked(self.recursive)
 
         self.statusbar.showMessage('ready')
+
+        self.typeList = []
 
         f = self.textEdit.font()
         f.setFamily("Courier New")
@@ -89,6 +89,16 @@ class YapgrepGuiProgram(Ui_MainWindow):
 
         self.statusbar.showMessage('Searching completed.')
 
+    def checkExtInTypeList(self, ext):
+        if self.typeList == []:
+            return True
+
+        if ext[1:] in self.typeList:
+            return True
+
+        return False
+
+
     def walkDirs(self, fileSpec, pattern):
         fs = os.path.expanduser(fileSpec)
         ic(fs)
@@ -111,7 +121,8 @@ class YapgrepGuiProgram(Ui_MainWindow):
         ic(self.recursive)
 
         for p in glob.iglob(fs, recursive=self.recursive):
-            if os.path.isfile(p):
+            (root, ext) = os.path.splitext(p)
+            if os.path.isfile(p) and self.checkExtInTypeList(ext):
                 buf = self.grepFile(p, pattern)
                 if buf:
                     self.textEdit.append('file: {}'.format(p))
@@ -141,8 +152,6 @@ class YapgrepGuiProgram(Ui_MainWindow):
                 pass
         return buf
 
-
-
     def exitCall(self):
         self.statusbar.showMessage('Exit app')
         qApp.quit()
@@ -155,7 +164,7 @@ if __name__ == '__main__':
     argparser.add_argument("-r", "-R", "--recurse", help="recurse down the directory tree", action="store_true", default=True)
     argparser.add_argument("-n", "--no-recurse", help="don't recurse down the directory tree", action="store_false", dest="recurse")
     argparser.add_argument("-g", "--go", help="implicitly push the search button", action="store_true")
-    argparser.add_argument("-t", "--type", help="specify filetypes for search", dest="ftype", nargs="+")
+    argparser.add_argument("-t", "--type", help="specify filetypes for search", action="append", dest="ftype")
 
     argparser.add_argument("pattern", nargs="?", default="")
     argparser.add_argument("filedirs", nargs="*", default=[os.getcwd()])
@@ -181,14 +190,13 @@ if __name__ == '__main__':
     with open('types.json', 'r') as f:
         types = json.load(f)
         # TODO add types to GUI
-        
+
     # Find user selected type
     if args.ftype is not None:
-        typeList = []
-        for t in args.ftype: 
+        for t in args.ftype:
             if t in types:
-                typeList += types[t]
-                ic(typeList)
+                ui.typeList += types[t]
+                ic(ui.typeList)
             else:
                 msg = 'User specified type not found: {}'.format(t)
                 ic(msg)
