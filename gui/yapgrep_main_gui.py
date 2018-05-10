@@ -14,6 +14,9 @@ import html
 import json
 
 
+types = {}  # type dict from json file
+
+
 def unixTimestamp():
     return '%s |> ' % datetime.now()
 
@@ -37,7 +40,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
 
         self.statusbar.showMessage('ready')
 
-        self.typeList = []
+        self.typeList = []   # list of file exts
 
         f = self.textEdit.font()
         f.setFamily("Courier New")
@@ -117,6 +120,13 @@ class YapgrepGuiProgram(Ui_MainWindow):
         elif os.path.isdir(path):
             fs = path + '/**/' + base
 
+        global types
+        self.typeList = []
+        for i in range(ui.ui2.listWidget.count()):
+            if ui.ui2.listWidget.item(i).checkState() == QtCore.Qt.Checked:
+                self.typeList += types[str(ui.ui2.listWidget.item(i).text())]
+                ic(types[str(ui.ui2.listWidget.item(i).text())])
+
         ic(fs)
         ic(self.recursive)
 
@@ -192,9 +202,9 @@ if __name__ == '__main__':
 
         for t in types:
             wi = QListWidgetItem(t)
-            wi.setCheckState(False)
+            wi.setCheckState(QtCore.Qt.Unchecked)
             ui.ui2.listWidget.addItem(wi)
-            
+
     # Find user selected type
     if args.ftype is not None:
         for t in args.ftype:
@@ -202,9 +212,9 @@ if __name__ == '__main__':
                 ui.typeList += types[t]
                 ic(ui.typeList)
                 item = ui.ui2.listWidget.findItems(t, QtCore.Qt.MatchExactly)
-                
+
                 if item:
-                    item[0].setCheckState(True)
+                    item[0].setCheckState(QtCore.Qt.Checked)
             else:
                 msg = 'User specified type not found: {}'.format(t)
                 ic(msg)
