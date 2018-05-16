@@ -23,6 +23,9 @@ class Ui_Common(object):
         self.listWidget = QtWidgets.QListWidget(Common)
         self.listWidget.setGeometry(QtCore.QRect(30, 80, 256, 192))
         self.listWidget.setObjectName("listWidget")
+        self.checkBox_2 = QtWidgets.QCheckBox(Common)
+        self.checkBox_2.setGeometry(QtCore.QRect(170, 30, 131, 21))
+        self.checkBox_2.setObjectName("checkBox_2")
 
         self.retranslateUi(Common)
         self.buttonBox.accepted.connect(Common.accept)
@@ -33,4 +36,5 @@ class Ui_Common(object):
         _translate = QtCore.QCoreApplication.translate
         Common.setWindowTitle(_translate("Common", "Dialog"))
         self.checkBox.setText(_translate("Common", "Recurse"))
+        self.checkBox_2.setText(_translate("Common", "Ignore Case"))
 

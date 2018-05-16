@@ -36,7 +36,9 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.ui2.setupUi(self.Common)
 
         self.recursive = True
+        self.ignorecase = False
         self.ui2.checkBox.setChecked(self.recursive)
+        self.ui2.checkBox_2.setChecked(self.ignorecase)
 
         self.statusbar.showMessage('ready')
 
@@ -58,6 +60,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
     def common_settings(self):
         self.Common.exec_()
         self.recursive = self.ui2.checkBox.isChecked()
+        self.ignorecase = self.ui2.checkBox_2.isChecked()
 
     def about(self):
         msg = QMessageBox()
@@ -77,7 +80,10 @@ class YapgrepGuiProgram(Ui_MainWindow):
         directory = self.lineEdit.text()
         pattern = self.lineEdit_2.text()
         pattern = '(' + pattern + ')'
-        reg = regex.compile(pattern)
+        if self.ignorecase:
+            reg = regex.compile(pattern, flags=regex.IGNORECASE)
+        else:
+            reg = regex.compile(pattern)
 
         for d in directory.split(':'):
             self.start = timer()
@@ -129,6 +135,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
 
         ic(fs)
         ic(self.recursive)
+        ic(self.ignorecase)
 
         for p in glob.iglob(fs, recursive=self.recursive):
             (root, ext) = os.path.splitext(p)
@@ -175,6 +182,7 @@ if __name__ == '__main__':
     argparser.add_argument("-n", "--no-recurse", help="don't recurse down the directory tree", action="store_false", dest="recurse")
     argparser.add_argument("-g", "--go", help="implicitly push the search button", action="store_true")
     argparser.add_argument("-t", "--type", help="specify filetypes for search", action="append", dest="ftype")
+    argparser.add_argument("-i", "--ignorecase", help="ignore case of search term", action="store_true")
 
     argparser.add_argument("pattern", nargs="?", default="")
     argparser.add_argument("filedirs", nargs="*", default=[os.getcwd()])
@@ -189,8 +197,10 @@ if __name__ == '__main__':
     ic(args)
     ic(args.recurse)
     ui.recursive = args.recurse
+    ui.ignorecase = args.ignorecase
 
     ui.ui2.checkBox.setChecked(ui.recursive)
+    ui.ui2.checkBox_2.setChecked(ui.ignorecase)
     ui.lineEdit.setText(QtCore.QCoreApplication.translate("MainWindow", ':'.join(args.filedirs)))
     ui.lineEdit_2.setText(QtCore.QCoreApplication.translate("MainWindow", args.pattern))
 
