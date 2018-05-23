@@ -17,11 +17,12 @@ A Python 3 file grepper like UniversalCodeGrep [ucg](https://github.com/gvansick
     
 * Switches (ripgrep/ucg like)
     * --gui=yes/no switch??
-    * -g       Go (run right away)
-    * -t FTYPE Type of files to look for
+    * -g       Implicitly push the search button
+    * -t FTYPE Specify filetypes for search
     * -r       Recurse (default)
     * -n       No recurse
     * -h       Help
+    * -i       Ignore case of search term
 
 ## Modules
 * regex
