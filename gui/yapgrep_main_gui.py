@@ -37,8 +37,10 @@ class YapgrepGuiProgram(Ui_MainWindow):
 
         self.recursive = True
         self.ignorecase = False
+        self.linenumber = False
         self.ui2.checkBox.setChecked(self.recursive)
         self.ui2.checkBox_2.setChecked(self.ignorecase)
+        self.ui2.checkBox_3.setChecked(self.linenumber)
 
         self.statusbar.showMessage('ready')
 
@@ -61,6 +63,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.Common.exec_()
         self.recursive = self.ui2.checkBox.isChecked()
         self.ignorecase = self.ui2.checkBox_2.isChecked()
+        self.linenumber = self.ui2.checkBox_3.isChecked()
 
     def about(self):
         msg = QMessageBox()
@@ -164,7 +167,10 @@ class YapgrepGuiProgram(Ui_MainWindow):
                         # escape HTML in line
                         line = html.escape(line)
                         newLine = regex.sub(pattern, r'<font color="red"><b>\1</b></font>', line)
-                        buf.append('&nbsp;&nbsp;&nbsp;&nbsp;{}:{}<br>'.format('<font color="blue">'+str(i)+'</font>', newLine))
+                        if self.linenumber:
+                            buf.append('&nbsp;&nbsp;&nbsp;&nbsp;{}:{}<br>'.format('<font color="blue">'+str(i)+'</font>', newLine))
+                        else:
+                            buf.append('&nbsp;&nbsp;&nbsp;&nbsp;{}<br>'.format(newLine))
             except UnicodeDecodeError:
                 pass
         return buf
@@ -183,6 +189,7 @@ if __name__ == '__main__':
     argparser.add_argument("-g", "--go", help="implicitly push the search button", action="store_true")
     argparser.add_argument("-t", "--type", help="specify filetypes for search", action="append", dest="ftype")
     argparser.add_argument("-i", "--ignorecase", help="ignore case of search term", action="store_true")
+    argparser.add_argument("-l", "--line-number", help="print line number of each line that contains a match", action="store_true", dest="linenumber")
 
     argparser.add_argument("pattern", nargs="?", default="")
     argparser.add_argument("filedirs", nargs="*", default=[os.getcwd()])
@@ -198,9 +205,11 @@ if __name__ == '__main__':
     ic(args.recurse)
     ui.recursive = args.recurse
     ui.ignorecase = args.ignorecase
+    ui.linenumber = args.linenumber
 
     ui.ui2.checkBox.setChecked(ui.recursive)
     ui.ui2.checkBox_2.setChecked(ui.ignorecase)
+    ui.ui2.checkBox_3.setChecked(ui.linenumber)
     ui.lineEdit.setText(QtCore.QCoreApplication.translate("MainWindow", ':'.join(args.filedirs)))
     ui.lineEdit_2.setText(QtCore.QCoreApplication.translate("MainWindow", args.pattern))
 

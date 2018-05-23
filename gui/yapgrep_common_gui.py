@@ -26,6 +26,9 @@ class Ui_Common(object):
         self.checkBox_2 = QtWidgets.QCheckBox(Common)
         self.checkBox_2.setGeometry(QtCore.QRect(170, 30, 131, 21))
         self.checkBox_2.setObjectName("checkBox_2")
+        self.checkBox_3 = QtWidgets.QCheckBox(Common)
+        self.checkBox_3.setGeometry(QtCore.QRect(310, 30, 131, 27))
+        self.checkBox_3.setObjectName("checkBox_3")
 
         self.retranslateUi(Common)
         self.buttonBox.accepted.connect(Common.accept)
@@ -37,4 +40,5 @@ class Ui_Common(object):
         Common.setWindowTitle(_translate("Common", "Dialog"))
         self.checkBox.setText(_translate("Common", "Recurse"))
         self.checkBox_2.setText(_translate("Common", "Ignore Case"))
+        self.checkBox_3.setText(_translate("Common", "Line Numbers"))
 
