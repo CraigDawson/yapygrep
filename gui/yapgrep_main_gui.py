@@ -1,6 +1,6 @@
 import sys
-from PyQt5 import QtWidgets, QtCore, Qt
-from PyQt5.QtWidgets import qApp, QMessageBox, QDialog, QListWidget, QListWidgetItem
+from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtWidgets import qApp, QMessageBox, QDialog, QListWidgetItem
 from yapgrep_gui import Ui_MainWindow
 from yapgrep_common_gui import Ui_Common
 import os
@@ -18,7 +18,8 @@ types = {}  # type dict from json file
 
 
 def unixTimestamp():
-    return '%s |> ' % datetime.now()
+    return "%s |> " % datetime.now()
+
 
 ic.configureOutput(prefix=unixTimestamp)
 
@@ -44,16 +45,16 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.ui2.checkBox_3.setChecked(self.linenumber)
         self.ui2.checkBox_4.setChecked(self.column)
 
-        self.statusbar.showMessage('ready')
+        self.statusbar.showMessage("ready")
 
-        self.typeList = []   # list of file exts
+        self.typeList = []  # list of file exts
 
         f = self.textEdit.font()
         f.setFamily("Courier New")
         f.setPointSize(18)
         self.textEdit.setFont(f)
 
-        self.textEdit.append('yapgrep {}'.format(self.version))
+        self.textEdit.append("yapgrep {}".format(self.version))
 
         self.actionQuit.triggered.connect(self.exitCall)
         self.actionGo.triggered.connect(self.search)
@@ -72,37 +73,37 @@ class YapgrepGuiProgram(Ui_MainWindow):
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Information)
         msg.setText("Yapygrep " + str(self.version))
-#        msg.setInformativeText("This is additional information")
+        #        msg.setInformativeText("This is additional information")
         msg.setWindowTitle("About")
-#        msg.setDetailedText("The details are as follows:")
+        #        msg.setDetailedText("The details are as follows:")
 
         msg.exec_()
 
     def search(self):
         self.files = 0
         self.matches = 0
-        self.statusbar.showMessage('Searching . . .')
+        self.statusbar.showMessage("Searching . . .")
         self.textEdit.clear()
         directory = self.lineEdit.text()
         pattern = self.lineEdit_2.text()
-        pattern = '(' + pattern + ')'
+        pattern = "(" + pattern + ")"
         if self.ignorecase:
             reg = regex.compile(pattern, flags=regex.IGNORECASE)
         else:
             reg = regex.compile(pattern)
 
-        for d in directory.split(':'):
+        for d in directory.split(":"):
             self.start = timer()
-            ic('Directory from user: {}'.format(d))
+            ic("Directory from user: {}".format(d))
 
             try:
                 self.walkDirs(d, reg)
             except:
                 ic("Some error occurred!".join(sys.exc_info()))
             self.end = timer()
-            self.textEdit.append('Time: {:.2f}'.format(self.end - self.start))
+            self.textEdit.append("Time: {:.2f}".format(self.end - self.start))
 
-        self.statusbar.showMessage('Searching completed.')
+        self.statusbar.showMessage("Searching completed.")
 
     def checkExtInTypeList(self, ext):
         if self.typeList == []:
@@ -112,7 +113,6 @@ class YapgrepGuiProgram(Ui_MainWindow):
             return True
 
         return False
-
 
     def walkDirs(self, fileSpec, pattern):
         fs = os.path.expanduser(fileSpec)
@@ -128,9 +128,9 @@ class YapgrepGuiProgram(Ui_MainWindow):
         ic(path)
 
         if os.path.isdir(fs):
-            fs += '/**'
+            fs += "/**"
         elif os.path.isdir(path):
-            fs = path + '/**/' + base
+            fs = path + "/**/" + base
 
         global types
         self.typeList = []
@@ -148,20 +148,22 @@ class YapgrepGuiProgram(Ui_MainWindow):
             if os.path.isfile(p) and self.checkExtInTypeList(ext):
                 buf = self.grepFile(p, pattern)
                 if buf:
-                    self.textEdit.append('file: {}'.format(p))
+                    self.textEdit.append("file: {}".format(p))
                     self.textEdit.append("".join(buf))
 
         ic(fs)
-        self.textEdit.append('Files searched: {}, Matches found: {}'.format(self.files, self.matches))
-        ic('Files searched: {}, Matches found: {}'.format(self.files, self.matches))
-        self.files,self.matches = 0,0
+        self.textEdit.append(
+            "Files searched: {}, Matches found: {}".format(self.files, self.matches)
+        )
+        ic("Files searched: {}, Matches found: {}".format(self.files, self.matches))
+        self.files, self.matches = 0, 0
 
     def grepFile(self, fileName, pattern):
         global app
         self.statusbar.showMessage(fileName)
         app.processEvents()
         buf = []
-        with open(fileName, 'r') as f:
+        with open(fileName, "r") as f:
             try:
                 self.files += 1
                 for i, line in enumerate(f):
@@ -169,49 +171,105 @@ class YapgrepGuiProgram(Ui_MainWindow):
                         self.matches += 1
                         # escape HTML in line
                         line = html.escape(line)
-                        newLine = regex.sub(pattern, r'<font color="red"><b>\1</b></font>', line)
+                        newLine = regex.sub(
+                            pattern, r'<font color="red"><b>\1</b></font>', line
+                        )
                         if self.linenumber:
                             if self.column:
                                 for m in regex.finditer(pattern, line):
                                     c = m.start()
                                     break
-                                buf.append('&nbsp;&nbsp;&nbsp;&nbsp;{}:{}<br>'.format('<font color="blue">'+str(i)+":"+str(c)+'</font>', newLine))
+                                buf.append(
+                                    "&nbsp;&nbsp;&nbsp;&nbsp;{}:{}<br>".format(
+                                        '<font color="blue">'
+                                        + str(i)
+                                        + ":"
+                                        + str(c)
+                                        + "</font>",
+                                        newLine,
+                                    )
+                                )
                             else:
-                                buf.append('&nbsp;&nbsp;&nbsp;&nbsp;{}:{}<br>'.format('<font color="blue">'+str(i)+'</font>', newLine))
+                                buf.append(
+                                    "&nbsp;&nbsp;&nbsp;&nbsp;{}:{}<br>".format(
+                                        '<font color="blue">' + str(i) + "</font>",
+                                        newLine,
+                                    )
+                                )
                         else:
-                            buf.append('&nbsp;&nbsp;&nbsp;&nbsp;{}<br>'.format(newLine))
+                            buf.append("&nbsp;&nbsp;&nbsp;&nbsp;{}<br>".format(newLine))
             except UnicodeDecodeError:
                 pass
         return buf
 
     def exitCall(self):
-        self.statusbar.showMessage('Exit app')
+        self.statusbar.showMessage("Exit app")
         qApp.quit()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
 
     argparser = argparse.ArgumentParser()
-    argparser.add_argument("-r", "-R", "--recurse", help="recurse down the directory tree", action="store_true", default=True)
-    argparser.add_argument("-n", "--no-recurse", help="don't recurse down the directory tree", action="store_false", dest="recurse")
-    argparser.add_argument("-g", "--go", help="implicitly push the search button", action="store_true")
-    argparser.add_argument("-t", "--type", help="specify filetypes for search", action="append", dest="ftype")
-    argparser.add_argument("-i", "--ignorecase", help="ignore case of search term", action="store_true")
-    argparser.add_argument("-l", "--line-number", help="print line number of each line that contains a match", action="store_true", dest="linenumber")
-    argparser.add_argument("-c", "--column", help="print column number of each line that contains a match", action="store_true")
-    argparser.add_argument("--help-types", "--list-file-types", help="print file types and exit", action="store_true", dest="helptypes")
+    argparser.add_argument(
+        "-r",
+        "-R",
+        "--recurse",
+        help="recurse down the directory tree",
+        action="store_true",
+        default=True,
+    )
+    argparser.add_argument(
+        "-n",
+        "--no-recurse",
+        help="don't recurse down the directory tree",
+        action="store_false",
+        dest="recurse",
+    )
+    argparser.add_argument(
+        "-g", "--go", help="implicitly push the search button", action="store_true"
+    )
+    argparser.add_argument(
+        "-t",
+        "--type",
+        help="specify filetypes for search",
+        action="append",
+        dest="ftype",
+    )
+    argparser.add_argument(
+        "-i", "--ignorecase", help="ignore case of search term", action="store_true"
+    )
+    argparser.add_argument(
+        "-l",
+        "--line-number",
+        help="print line number of each line that contains a match",
+        action="store_true",
+        dest="linenumber",
+    )
+    argparser.add_argument(
+        "-c",
+        "--column",
+        help="print column number of each line that contains a match",
+        action="store_true",
+    )
+    argparser.add_argument(
+        "--help-types",
+        "--list-file-types",
+        help="print file types and exit",
+        action="store_true",
+        dest="helptypes",
+    )
 
     argparser.add_argument("pattern", nargs="?", default="")
     argparser.add_argument("filedirs", nargs="*", default=[os.getcwd()])
     args = argparser.parse_args()
 
     if args.helptypes:
-        with open('types.json', 'r') as f:
+        with open("types.json", "r") as f:
             types = json.load(f)
 
             for t in types:
-                print(t, ':', types[t])
+                print(t, ":", types[t])
 
         sys.exit(1)
 
@@ -232,13 +290,15 @@ if __name__ == '__main__':
     ui.ui2.checkBox_2.setChecked(ui.ignorecase)
     ui.ui2.checkBox_3.setChecked(ui.linenumber)
     ui.ui2.checkBox_4.setChecked(ui.column)
-    ui.lineEdit.setText(QtCore.QCoreApplication.translate("MainWindow", ':'.join(args.filedirs)))
+    ui.lineEdit.setText(
+        QtCore.QCoreApplication.translate("MainWindow", ":".join(args.filedirs))
+    )
     ui.lineEdit_2.setText(QtCore.QCoreApplication.translate("MainWindow", args.pattern))
 
     MainWindow.show()
 
     # Read in valid types
-    with open('types.json', 'r') as f:
+    with open("types.json", "r") as f:
         types = json.load(f)
 
         for t in types:
@@ -257,7 +317,7 @@ if __name__ == '__main__':
                 if item:
                     item[0].setCheckState(QtCore.Qt.Checked)
             else:
-                msg = 'User specified type not found: {}'.format(t)
+                msg = "User specified type not found: {}".format(t)
                 ic(msg)
                 ui.textEdit.append('<font color="red">{}</font>'.format(msg))
 
