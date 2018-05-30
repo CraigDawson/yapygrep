@@ -38,9 +38,11 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.recursive = True
         self.ignorecase = False
         self.linenumber = False
+        self.column = False
         self.ui2.checkBox.setChecked(self.recursive)
         self.ui2.checkBox_2.setChecked(self.ignorecase)
         self.ui2.checkBox_3.setChecked(self.linenumber)
+        self.ui2.checkBox_4.setChecked(self.column)
 
         self.statusbar.showMessage('ready')
 
@@ -64,6 +66,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.recursive = self.ui2.checkBox.isChecked()
         self.ignorecase = self.ui2.checkBox_2.isChecked()
         self.linenumber = self.ui2.checkBox_3.isChecked()
+        self.column = self.ui2.checkBox_4.isChecked()
 
     def about(self):
         msg = QMessageBox()
@@ -168,7 +171,13 @@ class YapgrepGuiProgram(Ui_MainWindow):
                         line = html.escape(line)
                         newLine = regex.sub(pattern, r'<font color="red"><b>\1</b></font>', line)
                         if self.linenumber:
-                            buf.append('&nbsp;&nbsp;&nbsp;&nbsp;{}:{}<br>'.format('<font color="blue">'+str(i)+'</font>', newLine))
+                            if self.column:
+                                for m in regex.finditer(pattern, line):
+                                    c = m.start()
+                                    break
+                                buf.append('&nbsp;&nbsp;&nbsp;&nbsp;{}:{}<br>'.format('<font color="blue">'+str(i)+":"+str(c)+'</font>', newLine))
+                            else:
+                                buf.append('&nbsp;&nbsp;&nbsp;&nbsp;{}:{}<br>'.format('<font color="blue">'+str(i)+'</font>', newLine))
                         else:
                             buf.append('&nbsp;&nbsp;&nbsp;&nbsp;{}<br>'.format(newLine))
             except UnicodeDecodeError:
@@ -190,10 +199,21 @@ if __name__ == '__main__':
     argparser.add_argument("-t", "--type", help="specify filetypes for search", action="append", dest="ftype")
     argparser.add_argument("-i", "--ignorecase", help="ignore case of search term", action="store_true")
     argparser.add_argument("-l", "--line-number", help="print line number of each line that contains a match", action="store_true", dest="linenumber")
+    argparser.add_argument("-c", "--column", help="print column number of each line that contains a match", action="store_true")
+    argparser.add_argument("--help-types", "--list-file-types", help="print file types and exit", action="store_true", dest="helptypes")
 
     argparser.add_argument("pattern", nargs="?", default="")
     argparser.add_argument("filedirs", nargs="*", default=[os.getcwd()])
     args = argparser.parse_args()
+
+    if args.helptypes:
+        with open('types.json', 'r') as f:
+            types = json.load(f)
+
+            for t in types:
+                print(t, ':', types[t])
+
+        sys.exit(1)
 
     ic(args.filedirs)
 
@@ -206,10 +226,12 @@ if __name__ == '__main__':
     ui.recursive = args.recurse
     ui.ignorecase = args.ignorecase
     ui.linenumber = args.linenumber
+    ui.column = args.column
 
     ui.ui2.checkBox.setChecked(ui.recursive)
     ui.ui2.checkBox_2.setChecked(ui.ignorecase)
     ui.ui2.checkBox_3.setChecked(ui.linenumber)
+    ui.ui2.checkBox_4.setChecked(ui.column)
     ui.lineEdit.setText(QtCore.QCoreApplication.translate("MainWindow", ':'.join(args.filedirs)))
     ui.lineEdit_2.setText(QtCore.QCoreApplication.translate("MainWindow", args.pattern))
 
