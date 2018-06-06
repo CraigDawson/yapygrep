@@ -12,6 +12,7 @@ from datetime import datetime
 import argparse
 import html
 import json
+import time
 
 
 types = {}  # type dict from json file
@@ -40,10 +41,12 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.ignorecase = False
         self.linenumber = False
         self.column = False
+        self.smartcase = False
         self.ui2.checkBox.setChecked(self.recursive)
         self.ui2.checkBox_2.setChecked(self.ignorecase)
         self.ui2.checkBox_3.setChecked(self.linenumber)
         self.ui2.checkBox_4.setChecked(self.column)
+        self.ui2.checkBox_5.setChecked(self.smartcase)
 
         self.statusbar.showMessage("ready")
 
@@ -68,6 +71,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.ignorecase = self.ui2.checkBox_2.isChecked()
         self.linenumber = self.ui2.checkBox_3.isChecked()
         self.column = self.ui2.checkBox_4.isChecked()
+        self.smartcase = self.ui2.checkBox_5.isChecked()
 
     def about(self):
         msg = QMessageBox()
@@ -87,7 +91,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
         directory = self.lineEdit.text()
         pattern = self.lineEdit_2.text()
         pattern = "(" + pattern + ")"
-        if self.ignorecase:
+        if self.ignorecase or (pattern.islower() and self.smartcase):
             reg = regex.compile(pattern, flags=regex.IGNORECASE)
         else:
             reg = regex.compile(pattern)
@@ -101,7 +105,8 @@ class YapgrepGuiProgram(Ui_MainWindow):
             except:
                 ic("Some error occurred!".join(sys.exc_info()))
             self.end = timer()
-            self.textEdit.append("Time: {:.2f}".format(self.end - self.start))
+            elapsed = time.strftime("%H:%M:%S", time.gmtime(self.end - self.start))
+            self.textEdit.append("Time: {}".format(elapsed))
 
         self.statusbar.showMessage("Searching completed.")
 
@@ -116,16 +121,12 @@ class YapgrepGuiProgram(Ui_MainWindow):
 
     def walkDirs(self, fileSpec, pattern):
         fs = os.path.expanduser(fileSpec)
-        ic(fs)
 
         fs = os.path.expandvars(fs)
-        ic(fs)
 
         base = os.path.basename(fs)
-        ic(base)
 
         path = os.path.dirname(fs)
-        ic(path)
 
         if os.path.isdir(fs):
             fs += "/**"
@@ -140,8 +141,6 @@ class YapgrepGuiProgram(Ui_MainWindow):
                 ic(types[str(ui.ui2.listWidget.item(i).text())])
 
         ic(fs)
-        ic(self.recursive)
-        ic(self.ignorecase)
 
         for p in glob.iglob(fs, recursive=self.recursive):
             (root, ext) = os.path.splitext(p)
@@ -151,7 +150,6 @@ class YapgrepGuiProgram(Ui_MainWindow):
                     self.textEdit.append("file: {}".format(p))
                     self.textEdit.append("".join(buf))
 
-        ic(fs)
         self.textEdit.append(
             "Files searched: {}, Matches found: {}".format(self.files, self.matches)
         )
@@ -253,6 +251,13 @@ if __name__ == "__main__":
         action="store_true",
     )
     argparser.add_argument(
+        "-S",
+        "--smart-case",
+        help="search using smart case (ignore case if all lowercase)",
+        action="store_true",
+        dest="smartcase",
+    )
+    argparser.add_argument(
         "--help-types",
         "--list-file-types",
         help="print file types and exit",
@@ -280,16 +285,17 @@ if __name__ == "__main__":
     ui = YapgrepGuiProgram(MainWindow)
 
     ic(args)
-    ic(args.recurse)
     ui.recursive = args.recurse
     ui.ignorecase = args.ignorecase
     ui.linenumber = args.linenumber
     ui.column = args.column
+    ui.smartcase = args.smartcase
 
     ui.ui2.checkBox.setChecked(ui.recursive)
     ui.ui2.checkBox_2.setChecked(ui.ignorecase)
     ui.ui2.checkBox_3.setChecked(ui.linenumber)
     ui.ui2.checkBox_4.setChecked(ui.column)
+    ui.ui2.checkBox_5.setChecked(ui.smartcase)
     ui.lineEdit.setText(
         QtCore.QCoreApplication.translate("MainWindow", ":".join(args.filedirs))
     )
@@ -301,7 +307,7 @@ if __name__ == "__main__":
     with open("types.json", "r") as f:
         types = json.load(f)
 
-        for t in types:
+        for t in sorted(types):
             wi = QListWidgetItem(t)
             wi.setCheckState(QtCore.Qt.Unchecked)
             ui.ui2.listWidget.addItem(wi)

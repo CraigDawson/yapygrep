@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'common.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.7
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -11,20 +11,20 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Common(object):
     def setupUi(self, Common):
         Common.setObjectName("Common")
-        Common.resize(448, 405)
+        Common.resize(450, 405)
         self.buttonBox = QtWidgets.QDialogButtonBox(Common)
         self.buttonBox.setGeometry(QtCore.QRect(60, 340, 341, 32))
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
         self.checkBox = QtWidgets.QCheckBox(Common)
-        self.checkBox.setGeometry(QtCore.QRect(40, 30, 90, 21))
+        self.checkBox.setGeometry(QtCore.QRect(310, 230, 90, 21))
         self.checkBox.setObjectName("checkBox")
         self.listWidget = QtWidgets.QListWidget(Common)
         self.listWidget.setGeometry(QtCore.QRect(30, 80, 256, 192))
         self.listWidget.setObjectName("listWidget")
         self.checkBox_2 = QtWidgets.QCheckBox(Common)
-        self.checkBox_2.setGeometry(QtCore.QRect(170, 30, 131, 21))
+        self.checkBox_2.setGeometry(QtCore.QRect(310, 180, 131, 21))
         self.checkBox_2.setObjectName("checkBox_2")
         self.checkBox_3 = QtWidgets.QCheckBox(Common)
         self.checkBox_3.setGeometry(QtCore.QRect(310, 30, 131, 27))
@@ -32,6 +32,12 @@ class Ui_Common(object):
         self.checkBox_4 = QtWidgets.QCheckBox(Common)
         self.checkBox_4.setGeometry(QtCore.QRect(310, 80, 95, 27))
         self.checkBox_4.setObjectName("checkBox_4")
+        self.checkBox_5 = QtWidgets.QCheckBox(Common)
+        self.checkBox_5.setGeometry(QtCore.QRect(310, 130, 121, 27))
+        self.checkBox_5.setObjectName("checkBox_5")
+        self.label = QtWidgets.QLabel(Common)
+        self.label.setGeometry(QtCore.QRect(30, 50, 67, 21))
+        self.label.setObjectName("label")
 
         self.retranslateUi(Common)
         self.buttonBox.accepted.connect(Common.accept)
@@ -45,4 +51,6 @@ class Ui_Common(object):
         self.checkBox_2.setText(_translate("Common", "Ignore Case"))
         self.checkBox_3.setText(_translate("Common", "Line Numbers"))
         self.checkBox_4.setText(_translate("Common", "Column"))
+        self.checkBox_5.setText(_translate("Common", "Smart Case"))
+        self.label.setText(_translate("Common", "Types"))
 
