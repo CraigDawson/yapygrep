@@ -28,13 +28,21 @@ def primes(n):
         i = i + 1
 
     print(s, 'process completed.')
+
+    #print('prime: {}'.format(prime))
+    #print('len(prime): {}'.format(len(prime)))
+
     return prime
 
 
 if __name__ == '__main__':
+    ''' numbers is a list of how many prins to find '''
     numbers = [16000, 14000, 12000, 10000, 8000, 7000, 6000, 5000, 4000, 3000, 2000]
+    #numbers = [300, 200]
 
     numbers[:] = [x / 5 for x in numbers]
+
+    print('Numbers: {}'.format(numbers))
 
     numnums = len(numbers)
     print('Number of numbers: {}'.format(numnums))
@@ -45,7 +53,7 @@ if __name__ == '__main__':
     start = time()
     pool = ProcessPoolExecutor(max_workers=cpus)
     results = list(pool.map(primes, numbers))
-    print(results)
+    #print(results)
     end = time()
 
     print('Took %.3f seconds' % (end - start))
