@@ -38,6 +38,9 @@ class Ui_Common(object):
         self.label = QtWidgets.QLabel(Common)
         self.label.setGeometry(QtCore.QRect(30, 50, 67, 21))
         self.label.setObjectName("label")
+        self.checkBox_6 = QtWidgets.QCheckBox(Common)
+        self.checkBox_6.setGeometry(QtCore.QRect(320, 280, 88, 21))
+        self.checkBox_6.setObjectName("checkBox_6")
 
         self.retranslateUi(Common)
         self.buttonBox.accepted.connect(Common.accept)
@@ -53,4 +56,5 @@ class Ui_Common(object):
         self.checkBox_4.setText(_translate("Common", "Column"))
         self.checkBox_5.setText(_translate("Common", "Smart Case"))
         self.label.setText(_translate("Common", "Types"))
+        self.checkBox_6.setText(_translate("Common", "Raw"))
 

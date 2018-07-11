@@ -117,6 +117,19 @@
     <string>Types</string>
    </property>
   </widget>
+  <widget class="QCheckBox" name="checkBox_6">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>280</y>
+     <width>88</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Raw</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections>

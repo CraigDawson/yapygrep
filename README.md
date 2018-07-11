@@ -22,8 +22,13 @@ A Python 3 file grepper like UniversalCodeGrep [ucg](https://github.com/gvansick
     * -r       Recurse (default)
     * -n       No recurse
     * -h       Help
+    * --help-types	Print file types and exit
     * -i       Ignore case of search term
-
+    * -l       Line Number
+    * -c       Column Number
+    * -S       Smartcase search
+    * --raw    output without HTML formatting
+    
 ## Modules
 * regex
 

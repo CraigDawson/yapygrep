@@ -13,6 +13,8 @@ import argparse
 import html
 import json
 import time
+from html.parser import HTMLParser
+
 
 
 types = {}  # type dict from json file
@@ -29,7 +31,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
     def __init__(self, MainWindow):
         super().__init__()
 
-        self.version = 0.5
+        self.version = 0.6
 
         self.setupUi(MainWindow)
 
@@ -37,16 +39,20 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.ui2 = Ui_Common()
         self.ui2.setupUi(self.Common)
 
+        self.buf = []
+
         self.recursive = True
         self.ignorecase = False
         self.linenumber = False
         self.column = False
         self.smartcase = False
+        self.raw = False
         self.ui2.checkBox.setChecked(self.recursive)
         self.ui2.checkBox_2.setChecked(self.ignorecase)
         self.ui2.checkBox_3.setChecked(self.linenumber)
         self.ui2.checkBox_4.setChecked(self.column)
         self.ui2.checkBox_5.setChecked(self.smartcase)
+        self.ui2.checkBox_6.setChecked(self.raw)
 
         self.statusbar.showMessage("ready")
 
@@ -72,6 +78,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.linenumber = self.ui2.checkBox_3.isChecked()
         self.column = self.ui2.checkBox_4.isChecked()
         self.smartcase = self.ui2.checkBox_5.isChecked()
+        self.raw = self.ui2.checkBox_6.isChecked()
 
     def about(self):
         msg = QMessageBox()
@@ -85,6 +92,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
 
     def search(self):
         self.files = 0
+        self.matchedFiles = 0
         self.matches = 0
         self.statusbar.showMessage("Searching . . .")
         self.textEdit.clear()
@@ -105,7 +113,8 @@ class YapgrepGuiProgram(Ui_MainWindow):
             except:
                 ic("Some error occurred!".join(sys.exc_info()))
             self.end = timer()
-            elapsed = time.strftime("%H:%M:%S", time.gmtime(self.end - self.start))
+            elapsed = time.strftime("%H:%M:%S",
+                                    time.gmtime(self.end - self.start))
             self.textEdit.append("Time: {}".format(elapsed))
 
         self.statusbar.showMessage("Searching completed.")
@@ -145,64 +154,76 @@ class YapgrepGuiProgram(Ui_MainWindow):
         for p in glob.iglob(fs, recursive=self.recursive):
             (root, ext) = os.path.splitext(p)
             if os.path.isfile(p) and self.checkExtInTypeList(ext):
-                buf = self.grepFile(p, pattern)
-                if buf:
+                self.buf = self.grepFile(p, pattern)
+                if self.buf:
                     self.textEdit.append("file: {}".format(p))
-                    self.textEdit.append("".join(buf))
+                    self.textEdit.append("".join(self.buf))
 
-        self.textEdit.append(
-            "Files searched: {}, Matches found: {}".format(self.files, self.matches)
-        )
-        ic("Files searched: {}, Matches found: {}".format(self.files, self.matches))
-        self.files, self.matches = 0, 0
+        self.textEdit.append("Files searched: {}, Matched files: {}, Matches found: {}".format(
+            self.files, self.matchedFiles, self.matches))
+        ic("Files searched: {}, Matched files: {}, Matches found: {}".format(self.files, self.matchedFiles, self.matches))
+        self.files, self.matchedFiles, self.matches = 0, 0, 0
 
     def grepFile(self, fileName, pattern):
         global app
         self.statusbar.showMessage(fileName)
         app.processEvents()
-        buf = []
+        self.buf = []
+        matchFound = False
         with open(fileName, "r") as f:
             try:
                 self.files += 1
                 for i, line in enumerate(f):
                     if pattern.search(line):
                         self.matches += 1
+                        matchFound = True
                         # escape HTML in line
-                        line = html.escape(line)
-                        newLine = regex.sub(
-                            pattern, r'<font color="red"><b>\1</b></font>', line
-                        )
+                        line = line.rstrip('\n')
                         if self.linenumber:
                             if self.column:
                                 for m in regex.finditer(pattern, line):
                                     c = m.start()
                                     break
-                                buf.append(
-                                    "&nbsp;&nbsp;&nbsp;&nbsp;{}:{}<br>".format(
-                                        '<font color="blue">'
-                                        + str(i)
-                                        + ":"
-                                        + str(c)
-                                        + "</font>",
-                                        newLine,
-                                    )
-                                )
+                                line = html.escape(line)
+                                line = line if self.raw else regex.sub(
+                                    pattern, r'<font color="red"><b>\1</b></font>',
+                                    line)
+                                fmt = '{}:{}:{}' if self.raw else '<font color="blue">{}:{}:</font>{}'
+                                if (True):  # self.ruler == True
+                                    s = ""
+                                    for n in range(8):
+                                        s += str(n) + " " * 9
+                                    self.outputLine(
+                                        fmt.format(str(i), str(c), s))
+                                    self.outputLine(
+                                        fmt.format(str(i), str(c), "|123456789" * 8))
+                                self.outputLine(
+                                    fmt.format(str(i), str(c), line))
                             else:
-                                buf.append(
-                                    "&nbsp;&nbsp;&nbsp;&nbsp;{}:{}<br>".format(
-                                        '<font color="blue">' + str(i) + "</font>",
-                                        newLine,
-                                    )
-                                )
+                                line = html.escape(line)
+                                line = line if self.raw else regex.sub(
+                                    pattern, r'<font color="red"><b>\1</b></font>',
+                                    line)
+                                fmt = '{}:{}' if self.raw else '<font color="blue">{}:</font>{}'
+                                self.outputLine(fmt.format(str(i), line))
                         else:
-                            buf.append("&nbsp;&nbsp;&nbsp;&nbsp;{}<br>".format(newLine))
+                            line = html.escape(line)
+                            line = line if self.raw else regex.sub(
+                                pattern, r'<font color="red"><b>\1</b></font>',
+                                line)
+                            self.outputLine(line)
             except UnicodeDecodeError:
                 pass
-        return buf
+        if matchFound:
+            self.matchedFiles += 1
+        return self.buf
 
     def exitCall(self):
         self.statusbar.showMessage("Exit app")
         qApp.quit()
+
+    def outputLine(self, line):
+        self.buf.append("<pre><code>" + line + "</code></pre>")
 
 
 if __name__ == "__main__":
@@ -225,8 +246,10 @@ if __name__ == "__main__":
         dest="recurse",
     )
     argparser.add_argument(
-        "-g", "--go", help="implicitly push the search button", action="store_true"
-    )
+        "-g",
+        "--go",
+        help="implicitly push the search button",
+        action="store_true")
     argparser.add_argument(
         "-t",
         "--type",
@@ -235,8 +258,10 @@ if __name__ == "__main__":
         dest="ftype",
     )
     argparser.add_argument(
-        "-i", "--ignorecase", help="ignore case of search term", action="store_true"
-    )
+        "-i",
+        "--ignorecase",
+        help="ignore case of search term",
+        action="store_true")
     argparser.add_argument(
         "-l",
         "--line-number",
@@ -264,6 +289,11 @@ if __name__ == "__main__":
         action="store_true",
         dest="helptypes",
     )
+    argparser.add_argument(
+        "--raw",
+        help="don't use HTML formatting when outputing matched lines",
+        action="store_true",
+    )
 
     argparser.add_argument("pattern", nargs="?", default="")
     argparser.add_argument("filedirs", nargs="*", default=[os.getcwd()])
@@ -290,16 +320,19 @@ if __name__ == "__main__":
     ui.linenumber = args.linenumber
     ui.column = args.column
     ui.smartcase = args.smartcase
+    ui.raw = args.raw
 
     ui.ui2.checkBox.setChecked(ui.recursive)
     ui.ui2.checkBox_2.setChecked(ui.ignorecase)
     ui.ui2.checkBox_3.setChecked(ui.linenumber)
     ui.ui2.checkBox_4.setChecked(ui.column)
     ui.ui2.checkBox_5.setChecked(ui.smartcase)
+    ui.ui2.checkBox_6.setChecked(ui.raw)
     ui.lineEdit.setText(
-        QtCore.QCoreApplication.translate("MainWindow", ":".join(args.filedirs))
-    )
-    ui.lineEdit_2.setText(QtCore.QCoreApplication.translate("MainWindow", args.pattern))
+        QtCore.QCoreApplication.translate("MainWindow",
+                                          ":".join(args.filedirs)))
+    ui.lineEdit_2.setText(
+        QtCore.QCoreApplication.translate("MainWindow", args.pattern))
 
     MainWindow.show()
 
