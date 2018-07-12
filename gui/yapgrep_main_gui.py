@@ -6,7 +6,6 @@ from yapgrep_common_gui import Ui_Common
 import os
 import glob
 import regex
-from timeit import default_timer as timer
 from icecream import ic
 from datetime import datetime
 import argparse
@@ -105,17 +104,15 @@ class YapgrepGuiProgram(Ui_MainWindow):
             reg = regex.compile(pattern)
 
         for d in directory.split(":"):
-            self.start = timer()
+            self.start = datetime.now()
             ic("Directory from user: {}".format(d))
 
             try:
                 self.walkDirs(d, reg)
             except:
                 ic("Some error occurred!".join(sys.exc_info()))
-            self.end = timer()
-            elapsed = time.strftime("%H:%M:%S",
-                                    time.gmtime(self.end - self.start))
-            self.textEdit.append("Time: {}".format(elapsed))
+            self.end = datetime.now()
+            self.textEdit.append("Time: {}".format(self.end - self.start))
 
         self.statusbar.showMessage("Searching completed.")
 
