@@ -181,11 +181,11 @@ class YapgrepGuiProgram(Ui_MainWindow):
                     self.textEdit.append("file: {}".format(p))
                     self.textEdit.append("".join(self.buf))
 
+        fmt = "Files searched: {}, Matched files: {}, Matches found: {}" 
+        print(fmt.format(self.files, self.matchedFiles, self.matches))
         self.textEdit.append(
-            "Files searched: {}, Matched files: {}, Matches found: {}".format(
-                self.files, self.matchedFiles, self.matches))
-        ic("Files searched: {}, Matched files: {}, Matches found: {}".format(
-            self.files, self.matchedFiles, self.matches))
+            fmt.format( self.files, self.matchedFiles, self.matches))
+        ic(fmt.format( self.files, self.matchedFiles, self.matches))
         self.files, self.matchedFiles, self.matches = 0, 0, 0
 
     def grepFile(self, fileName, pattern):
