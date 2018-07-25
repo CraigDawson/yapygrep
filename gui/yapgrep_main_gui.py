@@ -1,19 +1,18 @@
-import sys
-from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtWidgets import qApp, QMessageBox, QDialog, QListWidgetItem
-from yapgrep_gui import Ui_MainWindow
-from yapgrep_common_gui import Ui_Common
-import os
-import glob
-import regex
-from icecream import ic
-from datetime import datetime
 import argparse
+import glob
 import html
 import json
-import time
-from html.parser import HTMLParser
+import os
+import sys
+from datetime import datetime
 
+import regex
+from icecream import ic
+from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtWidgets import QDialog, QListWidgetItem, QMessageBox, qApp
+
+from yapgrep_common_gui import Ui_Common
+from yapgrep_gui import Ui_MainWindow
 
 types = {}  # type dict from json file
 
@@ -127,7 +126,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
                     self.walkDirs(d, reg)
                 except YapCancel:
                     pass
-                except:
+                except:  # noqa: E722
                     ic("Some error occurred!".join(sys.exc_info()))
 
             self.end = datetime.now()
@@ -184,16 +183,16 @@ class YapgrepGuiProgram(Ui_MainWindow):
 
         self.textEdit.append(
             "Files searched: {}, Matched files: {}, Matches found: {}".format(
-                self.files, self.matchedFiles, self.matches
-            )
-        )
-        ic("Files searched: {}, Matched files: {}, Matches found: {}".format(self.files, self.matchedFiles, self.matches))
+                self.files, self.matchedFiles, self.matches))
+        ic("Files searched: {}, Matched files: {}, Matches found: {}".format(
+            self.files, self.matchedFiles, self.matches))
         self.files, self.matchedFiles, self.matches = 0, 0, 0
 
     def grepFile(self, fileName, pattern):
         global app
         self.statusbar.showMessage(fileName)
-        app.processEvents()  # allow Qt time to update display TODO: move into file loop with (i % 10000) == 0 ???
+        app.processEvents(
+        )  # TODO: move into file loop with (i % 10000) == 0 ???
         if not self.searching:
             raise YapCancel
         self.buf = []
@@ -212,55 +211,39 @@ class YapgrepGuiProgram(Ui_MainWindow):
                                     c = m.start()
                                     break
                                 line = html.escape(line)
-                                line = (
-                                    line
-                                    if self.raw
-                                    else regex.sub(
-                                        pattern,
-                                        r'<font color="red"><b>\1</b></font>',
-                                        line,
-                                    )
-                                )
-                                fmt = (
-                                    "{}:{}:{}"
-                                    if self.raw
-                                    else '<font color="blue">{}:{}:</font>{}'
-                                )
+                                line = (line if self.raw else regex.sub(
+                                    pattern,
+                                    r'<font color="red"><b>\1</b></font>',
+                                    line,
+                                ))
+                                fmt = ("{}:{}:{}" if self.raw else
+                                       '<font color="blue">{}:{}:</font>{}')
                                 if True:  # self.ruler == True
                                     s = ""
                                     for n in range(8):
                                         s += str(n) + " " * 9
-                                    self.outputLine(fmt.format(str(i), str(c), s))
                                     self.outputLine(
-                                        fmt.format(str(i), str(c), "|123456789" * 8)
-                                    )
-                                self.outputLine(fmt.format(str(i), str(c), line))
+                                        fmt.format(str(i), str(c), s))
+                                    self.outputLine(
+                                        fmt.format(
+                                            str(i), str(c), "|123456789" * 8))
+                                self.outputLine(
+                                    fmt.format(str(i), str(c), line))
                             else:
                                 line = html.escape(line)
-                                line = (
-                                    line
-                                    if self.raw
-                                    else regex.sub(
-                                        pattern,
-                                        r'<font color="red"><b>\1</b></font>',
-                                        line,
-                                    )
-                                )
-                                fmt = (
-                                    "{}:{}"
-                                    if self.raw
-                                    else '<font color="blue">{}:</font>{}'
-                                )
+                                line = (line if self.raw else regex.sub(
+                                    pattern,
+                                    r'<font color="red"><b>\1</b></font>',
+                                    line,
+                                ))
+                                fmt = ("{}:{}" if self.raw else
+                                       '<font color="blue">{}:</font>{}')
                                 self.outputLine(fmt.format(str(i), line))
                         else:
                             line = html.escape(line)
-                            line = (
-                                line
-                                if self.raw
-                                else regex.sub(
-                                    pattern, r'<font color="red"><b>\1</b></font>', line
-                                )
-                            )
+                            line = (line if self.raw else regex.sub(
+                                pattern, r'<font color="red"><b>\1</b></font>',
+                                line))
                             self.outputLine(line)
             except UnicodeDecodeError:
                 pass
@@ -296,8 +279,10 @@ if __name__ == "__main__":
         dest="recurse",
     )
     argparser.add_argument(
-        "-g", "--go", help="implicitly push the search button", action="store_true"
-    )
+        "-g",
+        "--go",
+        help="implicitly push the search button",
+        action="store_true")
     argparser.add_argument(
         "-t",
         "--type",
@@ -306,8 +291,10 @@ if __name__ == "__main__":
         dest="ftype",
     )
     argparser.add_argument(
-        "-i", "--ignorecase", help="ignore case of search term", action="store_true"
-    )
+        "-i",
+        "--ignorecase",
+        help="ignore case of search term",
+        action="store_true")
     argparser.add_argument(
         "-l",
         "--line-number",
@@ -375,9 +362,10 @@ if __name__ == "__main__":
     ui.ui2.checkBox_5.setChecked(ui.smartcase)
     ui.ui2.checkBox_6.setChecked(ui.raw)
     ui.lineEdit.setText(
-        QtCore.QCoreApplication.translate("MainWindow", ":".join(args.filedirs))
-    )
-    ui.lineEdit_2.setText(QtCore.QCoreApplication.translate("MainWindow", args.pattern))
+        QtCore.QCoreApplication.translate("MainWindow",
+                                          ":".join(args.filedirs)))
+    ui.lineEdit_2.setText(
+        QtCore.QCoreApplication.translate("MainWindow", args.pattern))
 
     MainWindow.show()
 
