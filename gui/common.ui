@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Common</string>
   </property>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
@@ -75,7 +75,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Line Numbers</string>
+    <string>Line</string>
    </property>
   </widget>
   <widget class="QCheckBox" name="checkBox_4">
@@ -86,6 +86,9 @@
      <width>95</width>
      <height>27</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>Column relies on Line numbers</string>
    </property>
    <property name="text">
     <string>Column</string>
@@ -120,7 +123,7 @@
   <widget class="QCheckBox" name="checkBox_6">
    <property name="geometry">
     <rect>
-     <x>320</x>
+     <x>310</x>
      <y>280</y>
      <width>88</width>
      <height>21</height>
@@ -130,6 +133,29 @@
     <string>Raw</string>
    </property>
   </widget>
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
+    <rect>
+     <x>300</x>
+     <y>10</y>
+     <width>121</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Numbers</string>
+   </property>
+  </widget>
+  <zorder>groupBox</zorder>
+  <zorder>buttonBox</zorder>
+  <zorder>checkBox</zorder>
+  <zorder>listWidget</zorder>
+  <zorder>checkBox_2</zorder>
+  <zorder>checkBox_3</zorder>
+  <zorder>checkBox_4</zorder>
+  <zorder>checkBox_5</zorder>
+  <zorder>label</zorder>
+  <zorder>checkBox_6</zorder>
  </widget>
  <resources/>
  <connections>
