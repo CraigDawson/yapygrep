@@ -48,6 +48,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.column = False
         self.smartcase = False
         self.raw = False
+        self.ruler = False
 
         self.searching = False
 
@@ -97,6 +98,32 @@ class YapgrepGuiProgram(Ui_MainWindow):
     def cancel(self):
         raise YapCancel("Cancel", "Canceled")
 
+
+    def printRuler(self, fmt, line, ln = None, cn = None):
+        s = ""
+        for n in range(8):
+            s += str(n) + " " * 9
+        
+        if ln and cn:
+            self.outputLine(
+                fmt.format(str(ln), str(cn), s))
+            self.outputLine(
+                fmt.format(str(ln), str(cn), "|123456789" * 8))
+        elif ln:
+            self.outputLine(
+                fmt.format(str(ln), s))
+            self.outputLine(
+                fmt.format(str(ln), "|123456789" * 8))
+        else:
+            self.outputLine(s)
+            self.outputLine("|123456789" * 8)
+
+
+
+
+
+
+        
     def search(self):
         if self.searching:
             self.searching = False
@@ -217,16 +244,11 @@ class YapgrepGuiProgram(Ui_MainWindow):
                                     line,
                                 ))
                                 fmt = ("{}:{}:{}" if self.raw else
-                                       '<font color="blue">{}:{}:</font>{}')
-                                if True:  # self.ruler == True
-                                    s = ""
-                                    for n in range(8):
-                                        s += str(n) + " " * 9
-                                    self.outputLine(
-                                        fmt.format(str(i), str(c), s))
-                                    self.outputLine(
-                                        fmt.format(
-                                            str(i), str(c), "|123456789" * 8))
+                                    '<font color="blue">{}:{}:</font>{}')
+
+                                if self.ruler:
+                                    self.printRuler(fmt, line, i, c)
+                                    
                                 self.outputLine(
                                     fmt.format(str(i), str(c), line))
                             else:
@@ -237,13 +259,18 @@ class YapgrepGuiProgram(Ui_MainWindow):
                                     line,
                                 ))
                                 fmt = ("{}:{}" if self.raw else
-                                       '<font color="blue">{}:</font>{}')
+                                    '<font color="blue">{}:</font>{}')
+                                if self.ruler:
+                                    self.printRuler(fmt, line, i)
+
                                 self.outputLine(fmt.format(str(i), line))
                         else:
                             line = html.escape(line)
                             line = (line if self.raw else regex.sub(
                                 pattern, r'<font color="red"><b>\1</b></font>',
                                 line))
+                            if self.ruler:
+                                self.printRuler("{}", line)
                             self.outputLine(line)
             except UnicodeDecodeError:
                 pass
@@ -327,7 +354,13 @@ if __name__ == "__main__":
         help="don't use HTML formatting when outputing matched lines",
         action="store_true",
     )
-
+    
+    argparser.add_argument(
+        "--ruler",
+        help="print out a column ruler for each line",
+        action="store_true",
+    )
+    
     argparser.add_argument("pattern", nargs="?", default="")
     argparser.add_argument("filedirs", nargs="*", default=[os.getcwd()])
     args = argparser.parse_args()
@@ -354,7 +387,8 @@ if __name__ == "__main__":
     ui.column = args.column
     ui.smartcase = args.smartcase
     ui.raw = args.raw
-
+    ui.ruler = args.ruler
+    
     ui.ui2.checkBox.setChecked(ui.recursive)
     ui.ui2.checkBox_2.setChecked(ui.ignorecase)
     ui.ui2.checkBox_3.setChecked(ui.linenumber)
