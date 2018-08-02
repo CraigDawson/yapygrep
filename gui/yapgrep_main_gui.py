@@ -98,32 +98,21 @@ class YapgrepGuiProgram(Ui_MainWindow):
     def cancel(self):
         raise YapCancel("Cancel", "Canceled")
 
-
-    def printRuler(self, fmt, line, ln = None, cn = None):
+    def printRuler(self, fmt, line, ln=None, cn=None):
         s = ""
         for n in range(8):
             s += str(n) + " " * 9
-        
+
         if ln and cn:
-            self.outputLine(
-                fmt.format(str(ln), str(cn), s))
-            self.outputLine(
-                fmt.format(str(ln), str(cn), "|123456789" * 8))
+            self.outputLine(fmt.format(str(ln), str(cn), s))
+            self.outputLine(fmt.format(str(ln), str(cn), "|123456789" * 8))
         elif ln:
-            self.outputLine(
-                fmt.format(str(ln), s))
-            self.outputLine(
-                fmt.format(str(ln), "|123456789" * 8))
+            self.outputLine(fmt.format(str(ln), s))
+            self.outputLine(fmt.format(str(ln), "|123456789" * 8))
         else:
             self.outputLine(s)
             self.outputLine("|123456789" * 8)
 
-
-
-
-
-
-        
     def search(self):
         if self.searching:
             self.searching = False
@@ -208,11 +197,11 @@ class YapgrepGuiProgram(Ui_MainWindow):
                     self.textEdit.append("file: {}".format(p))
                     self.textEdit.append("".join(self.buf))
 
-        fmt = "Files searched: {}, Matched files: {}, Matches found: {}" 
+        fmt = "Files searched: {}, Matched files: {}, Matches found: {}"
         print(fmt.format(self.files, self.matchedFiles, self.matches))
         self.textEdit.append(
-            fmt.format( self.files, self.matchedFiles, self.matches))
-        ic(fmt.format( self.files, self.matchedFiles, self.matches))
+            fmt.format(self.files, self.matchedFiles, self.matches))
+        ic(fmt.format(self.files, self.matchedFiles, self.matches))
         self.files, self.matchedFiles, self.matches = 0, 0, 0
 
     def grepFile(self, fileName, pattern):
@@ -244,11 +233,11 @@ class YapgrepGuiProgram(Ui_MainWindow):
                                     line,
                                 ))
                                 fmt = ("{}:{}:{}" if self.raw else
-                                    '<font color="blue">{}:{}:</font>{}')
+                                       '<font color="blue">{}:{}:</font>{}')
 
                                 if self.ruler:
                                     self.printRuler(fmt, line, i, c)
-                                    
+
                                 self.outputLine(
                                     fmt.format(str(i), str(c), line))
                             else:
@@ -259,7 +248,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
                                     line,
                                 ))
                                 fmt = ("{}:{}" if self.raw else
-                                    '<font color="blue">{}:</font>{}')
+                                       '<font color="blue">{}:</font>{}')
                                 if self.ruler:
                                     self.printRuler(fmt, line, i)
 
@@ -354,13 +343,13 @@ if __name__ == "__main__":
         help="don't use HTML formatting when outputing matched lines",
         action="store_true",
     )
-    
+
     argparser.add_argument(
         "--ruler",
         help="print out a column ruler for each line",
         action="store_true",
     )
-    
+
     argparser.add_argument("pattern", nargs="?", default="")
     argparser.add_argument("filedirs", nargs="*", default=[os.getcwd()])
     args = argparser.parse_args()
@@ -388,7 +377,7 @@ if __name__ == "__main__":
     ui.smartcase = args.smartcase
     ui.raw = args.raw
     ui.ruler = args.ruler
-    
+
     ui.ui2.checkBox.setChecked(ui.recursive)
     ui.ui2.checkBox_2.setChecked(ui.ignorecase)
     ui.ui2.checkBox_3.setChecked(ui.linenumber)
