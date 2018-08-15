@@ -27,7 +27,16 @@ ic.configureOutput(prefix=unixTimestamp)
 class YapCancel(Exception):
     pass
 
+class CommonDialog(Ui_Common):
+    def __init__(self, Common):
+        super().__init__()
+        self.setupUi(Common)
+        self.checkBox_3.stateChanged.connect(self.lineChange)
 
+    def lineChange(self, i):
+        self.checkBox_4.setEnabled(self.checkBox_3.isChecked())
+        # if we are clearing linenumber, we need to slear column as well
+        
 class YapgrepGuiProgram(Ui_MainWindow):
     def __init__(self, MainWindow):
         super().__init__()
@@ -37,8 +46,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.setupUi(MainWindow)
 
         self.Common = QDialog()
-        self.ui2 = Ui_Common()
-        self.ui2.setupUi(self.Common)
+        self.ui2 = CommonDialog(self.Common)
 
         self.buf = []
 
@@ -58,6 +66,9 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.ui2.checkBox_4.setChecked(self.column)
         self.ui2.checkBox_5.setChecked(self.smartcase)
         self.ui2.checkBox_6.setChecked(self.raw)
+
+        ic(self.ui2.checkBox_3.isChecked())
+        self.ui2.checkBox_4.setEnabled(self.ui2.checkBox_3.isChecked())
 
         self.statusbar.showMessage("ready")
 
@@ -380,8 +391,9 @@ if __name__ == "__main__":
 
     ui.ui2.checkBox.setChecked(ui.recursive)
     ui.ui2.checkBox_2.setChecked(ui.ignorecase)
-    ui.ui2.checkBox_3.setChecked(ui.linenumber)
+    ui.ui2.checkBox_3.setChecked(ui.linenumber or ui.column)
     ui.ui2.checkBox_4.setChecked(ui.column)
+    ui.ui2.checkBox_4.setEnabled(ui.column or ui.linenumber)
     ui.ui2.checkBox_5.setChecked(ui.smartcase)
     ui.ui2.checkBox_6.setChecked(ui.raw)
     ui.lineEdit.setText(
