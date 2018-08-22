@@ -56,9 +56,9 @@ class YapgrepGuiProgram(Ui_MainWindow):
 
         self.recursive = True
         self.ignorecase = False
-        self.linenumber = False
+        self.linenumber = True
         self.column = False
-        self.smartcase = False
+        self.smartcase = True
         self.raw = False
         self.ruler = False
 
@@ -341,6 +341,7 @@ if __name__ == "__main__":
         help="print line number of each line that contains a match",
         action="store_true",
         dest="linenumber",
+        default=True,
     )
     argparser.add_argument(
         "-c",
@@ -354,6 +355,7 @@ if __name__ == "__main__":
         help="search using smart case (ignore case if all lowercase)",
         action="store_true",
         dest="smartcase",
+        default=True,
     )
     argparser.add_argument(
         "--help-types",
