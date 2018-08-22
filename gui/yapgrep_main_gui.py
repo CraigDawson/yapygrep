@@ -27,6 +27,7 @@ ic.configureOutput(prefix=unixTimestamp)
 class YapCancel(Exception):
     pass
 
+
 class CommonDialog(Ui_Common):
     def __init__(self, Common):
         super().__init__()
@@ -34,9 +35,12 @@ class CommonDialog(Ui_Common):
         self.checkBox_3.stateChanged.connect(self.lineChange)
 
     def lineChange(self, i):
+        if not self.checkBox_3.isChecked():
+            self.checkBox_4.setChecked(False)
+
         self.checkBox_4.setEnabled(self.checkBox_3.isChecked())
-        # if we are clearing linenumber, we need to slear column as well
-        
+
+
 class YapgrepGuiProgram(Ui_MainWindow):
     def __init__(self, MainWindow):
         super().__init__()
@@ -66,6 +70,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.ui2.checkBox_4.setChecked(self.column)
         self.ui2.checkBox_5.setChecked(self.smartcase)
         self.ui2.checkBox_6.setChecked(self.raw)
+        self.ui2.checkBox_7.setChecked(self.ruler)
 
         ic(self.ui2.checkBox_3.isChecked())
         self.ui2.checkBox_4.setEnabled(self.ui2.checkBox_3.isChecked())
@@ -95,6 +100,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.column = self.ui2.checkBox_4.isChecked()
         self.smartcase = self.ui2.checkBox_5.isChecked()
         self.raw = self.ui2.checkBox_6.isChecked()
+        self.ruler = self.ui2.checkBox_7.isChecked()
 
     def about(self):
         msg = QMessageBox()
@@ -114,6 +120,10 @@ class YapgrepGuiProgram(Ui_MainWindow):
         for n in range(8):
             s += str(n) + " " * 9
 
+        #  '<font color="blue">{}:{}:</font>{}'
+        if not self.raw:
+            self.buf.append('<font color="gray">')
+
         if ln and cn:
             self.outputLine(fmt.format(str(ln), str(cn), s))
             self.outputLine(fmt.format(str(ln), str(cn), "|123456789" * 8))
@@ -123,6 +133,9 @@ class YapgrepGuiProgram(Ui_MainWindow):
         else:
             self.outputLine(s)
             self.outputLine("|123456789" * 8)
+
+        if not self.raw:
+            self.buf.append('</font>')
 
     def search(self):
         if self.searching:
@@ -396,6 +409,7 @@ if __name__ == "__main__":
     ui.ui2.checkBox_4.setEnabled(ui.column or ui.linenumber)
     ui.ui2.checkBox_5.setChecked(ui.smartcase)
     ui.ui2.checkBox_6.setChecked(ui.raw)
+    ui.ui2.checkBox_7.setChecked(ui.ruler)
     ui.lineEdit.setText(
         QtCore.QCoreApplication.translate("MainWindow",
                                           ":".join(args.filedirs)))
