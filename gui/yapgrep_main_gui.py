@@ -42,7 +42,7 @@ class CommonDialog(Ui_Common):
 
 
 class YapgrepGuiProgram(Ui_MainWindow):
-    def __init__(self, MainWindow):
+    def __init__(self, MainWindow, args):
         super().__init__()
 
         self.version = 0.6
@@ -54,26 +54,33 @@ class YapgrepGuiProgram(Ui_MainWindow):
 
         self.buf = []
 
-        self.recursive = True
-        self.ignorecase = False
-        self.linenumber = True
-        self.column = False
-        self.smartcase = True
-        self.raw = False
-        self.ruler = False
+        # when we parse args, recursive is defaulted by the argParse()
+        self.recursive = args.recurse
+        self.ignorecase = args.ignorecase
+        self.linenumber = args.linenumber
+        self.column = args.column
+        self.smartcase = args.smartcase
+        self.raw = args.raw
+        self.ruler = args.ruler
 
         self.searching = False
 
         self.ui2.checkBox.setChecked(self.recursive)
         self.ui2.checkBox_2.setChecked(self.ignorecase)
-        self.ui2.checkBox_3.setChecked(self.linenumber)
+        self.ui2.checkBox_3.setChecked(self.linenumber or self.column)
         self.ui2.checkBox_4.setChecked(self.column)
         self.ui2.checkBox_5.setChecked(self.smartcase)
         self.ui2.checkBox_6.setChecked(self.raw)
         self.ui2.checkBox_7.setChecked(self.ruler)
 
-        ic(self.ui2.checkBox_3.isChecked())
+        #        ic(self.ui2.checkBox_3.isChecked())
         self.ui2.checkBox_4.setEnabled(self.ui2.checkBox_3.isChecked())
+
+        self.lineEdit.setText(
+            QtCore.QCoreApplication.translate("MainWindow",
+                                              ":".join(args.filedirs)))
+        self.lineEdit_2.setText(
+            QtCore.QCoreApplication.translate("MainWindow", args.pattern))
 
         self.statusbar.showMessage("ready")
 
@@ -393,30 +400,9 @@ if __name__ == "__main__":
 
     MainWindow = QtWidgets.QMainWindow()
 
-    ui = YapgrepGuiProgram(MainWindow)
+    ui = YapgrepGuiProgram(MainWindow, args)
 
     ic(args)
-    ui.recursive = args.recurse
-    ui.ignorecase = args.ignorecase
-    ui.linenumber = args.linenumber
-    ui.column = args.column
-    ui.smartcase = args.smartcase
-    ui.raw = args.raw
-    ui.ruler = args.ruler
-
-    ui.ui2.checkBox.setChecked(ui.recursive)
-    ui.ui2.checkBox_2.setChecked(ui.ignorecase)
-    ui.ui2.checkBox_3.setChecked(ui.linenumber or ui.column)
-    ui.ui2.checkBox_4.setChecked(ui.column)
-    ui.ui2.checkBox_4.setEnabled(ui.column or ui.linenumber)
-    ui.ui2.checkBox_5.setChecked(ui.smartcase)
-    ui.ui2.checkBox_6.setChecked(ui.raw)
-    ui.ui2.checkBox_7.setChecked(ui.ruler)
-    ui.lineEdit.setText(
-        QtCore.QCoreApplication.translate("MainWindow",
-                                          ":".join(args.filedirs)))
-    ui.lineEdit_2.setText(
-        QtCore.QCoreApplication.translate("MainWindow", args.pattern))
 
     MainWindow.show()
 
