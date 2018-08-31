@@ -35,3 +35,5 @@ A Python 3 file grepper like UniversalCodeGrep [ucg](https://github.com/gvansick
 ## Interpreter
 * [pypy](https://pypy.org) if it works in PyQt5
 
+## Call Graph
+[![yapgrep static call graph](yapgrep.svg "yapgrep call graph")](yapgrep.svg)
