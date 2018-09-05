@@ -59,11 +59,15 @@ class Ui_Common(object):
         self.checkBox_7.setObjectName("checkBox_7")
         self.verticalLayout.addWidget(self.checkBox_7)
         self.verticalLayout_3.addLayout(self.verticalLayout)
+        self.checkBox_8 = QtWidgets.QCheckBox(Common)
+        self.checkBox_8.setGeometry(QtCore.QRect(310, 250, 85, 20))
+        self.checkBox_8.setObjectName("checkBox_8")
         self.groupBox.raise_()
         self.layoutWidget.raise_()
         self.buttonBox.raise_()
         self.listWidget.raise_()
         self.label.raise_()
+        self.checkBox_8.raise_()
 
         self.retranslateUi(Common)
         self.buttonBox.accepted.connect(Common.accept)
@@ -83,4 +87,5 @@ class Ui_Common(object):
         self.checkBox.setText(_translate("Common", "Recurse"))
         self.checkBox_6.setText(_translate("Common", "Raw"))
         self.checkBox_7.setText(_translate("Common", "Ruler"))
+        self.checkBox_8.setText(_translate("Common", "Files"))
 

@@ -33,12 +33,22 @@ class CommonDialog(Ui_Common):
         super().__init__()
         self.setupUi(Common)
         self.checkBox_3.stateChanged.connect(self.lineChange)
+        self.checkBox_2.stateChanged.connect(self.ignoreChange)
+        self.checkBox_5.stateChanged.connect(self.smartChange)
 
     def lineChange(self, i):
         if not self.checkBox_3.isChecked():
             self.checkBox_4.setChecked(False)
 
         self.checkBox_4.setEnabled(self.checkBox_3.isChecked())
+
+    def ignoreChange(self, i):
+        if self.checkBox_2.isChecked():
+            self.checkBox_5.setChecked(False)
+
+    def smartChange(self, i):
+        if self.checkBox_5.isChecked():
+            self.checkBox_2.setChecked(False)
 
 
 class YapgrepGuiProgram(Ui_MainWindow):
@@ -62,6 +72,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.smartcase = args.smartcase
         self.raw = args.raw
         self.ruler = args.ruler
+        self.fileSearch = args.files
 
         self.searching = False
 
@@ -72,6 +83,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.ui2.checkBox_5.setChecked(self.smartcase)
         self.ui2.checkBox_6.setChecked(self.raw)
         self.ui2.checkBox_7.setChecked(self.ruler)
+        self.ui2.checkBox_8.setChecked(self.fileSearch)
 
         #        ic(self.ui2.checkBox_3.isChecked())
         self.ui2.checkBox_4.setEnabled(self.ui2.checkBox_3.isChecked())
@@ -108,6 +120,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.smartcase = self.ui2.checkBox_5.isChecked()
         self.raw = self.ui2.checkBox_6.isChecked()
         self.ruler = self.ui2.checkBox_7.isChecked()
+        self.fileSearch = self.ui2.checkBox_8.isChecked()
 
     def about(self):
         msg = QMessageBox()
@@ -219,15 +232,27 @@ class YapgrepGuiProgram(Ui_MainWindow):
 
         ic(fs)
 
+        i = 0
         for p in glob.iglob(fs, recursive=self.recursive):
-            (root, ext) = os.path.splitext(p)
-            if os.path.isfile(p) and self.checkExtInTypeList(ext):
-                """ Grep the file """
-                self.buf = self.grepFile(p, pattern)
-                if self.buf:
-                    self.textEdit.append("file: {}".format(p))
-                    self.textEdit.append("".join(self.buf))
-
+            if (i % 100) == 0:
+                app.processEvents() 
+            if self.fileSearch:
+                self.files += 1
+                if pattern.search(p):
+                    self.textEdit.append("{}".format(p))  # raw output
+                    self.matchedFiles += 1
+                    self.matches += 1
+                if not self.searching:
+                    raise YapCancel
+            else:
+                (root, ext) = os.path.splitext(p)
+                if os.path.isfile(p) and self.checkExtInTypeList(ext):
+                    """ Grep the file """
+                    self.buf = self.grepFile(p, pattern)
+                    if self.buf:
+                        self.textEdit.append("file: {}".format(p))
+                        self.textEdit.append("".join(self.buf))
+            i += 1
         fmt = "Files searched: {}, Matched files: {}, Matches found: {}"
         print(fmt.format(self.files, self.matchedFiles, self.matches))
         self.textEdit.append(
@@ -310,7 +335,23 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
 
     argparser = argparse.ArgumentParser()
-    argparser.add_argument(
+    group = argparser.add_mutually_exclusive_group()
+    group.add_argument(
+        "-S",
+        "--smart-case",
+        help="search using smart case (ignore case if all lowercase)",
+        action="store_true",
+        dest="smartcase",
+        default=True,
+    )
+    group.add_argument(
+        "-i",
+        "--ignorecase",
+        help="ignore case of search term",
+        action="store_true"
+    )
+    group1 = argparser.add_mutually_exclusive_group()
+    group1.add_argument(
         "-r",
         "-R",
         "--recurse",
@@ -318,7 +359,7 @@ if __name__ == "__main__":
         action="store_true",
         default=True,
     )
-    argparser.add_argument(
+    group1.add_argument(
         "-n",
         "--no-recurse",
         help="don't recurse down the directory tree",
@@ -338,11 +379,6 @@ if __name__ == "__main__":
         dest="ftype",
     )
     argparser.add_argument(
-        "-i",
-        "--ignorecase",
-        help="ignore case of search term",
-        action="store_true")
-    argparser.add_argument(
         "-l",
         "--line-number",
         help="print line number of each line that contains a match",
@@ -357,12 +393,11 @@ if __name__ == "__main__":
         action="store_true",
     )
     argparser.add_argument(
-        "-S",
-        "--smart-case",
-        help="search using smart case (ignore case if all lowercase)",
+        "--files",
+        help="search file names instead of files",
         action="store_true",
-        dest="smartcase",
-        default=True,
+        dest="files",
+        default=False,
     )
     argparser.add_argument(
         "--help-types",
