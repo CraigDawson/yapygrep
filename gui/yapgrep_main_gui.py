@@ -234,8 +234,10 @@ class YapgrepGuiProgram(Ui_MainWindow):
 
         i = 0
         for p in glob.iglob(fs, recursive=self.recursive):
+            if (i % 500) == 0 and os.path.isdir(p):
+                self.statusbar.showMessage(p)
             if (i % 100) == 0:
-                app.processEvents() 
+                app.processEvents()
             if self.fileSearch:
                 self.files += 1
                 if pattern.search(p):
