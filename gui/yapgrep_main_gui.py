@@ -5,6 +5,7 @@ import json
 import os
 import sys
 from datetime import datetime
+from collections import deque
 
 import regex
 from icecream import ic
@@ -73,6 +74,21 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.raw = args.raw
         self.ruler = args.ruler
         self.fileSearch = args.files
+        if args.beforeCount:
+            self.beforeCount = args.beforeCount[0]
+        else:
+            self.beforeCount = None
+        if args.afterCount:
+            self.afterCount = args.afterCount[0]
+        else:
+            self.afterCount = None
+
+        if args.aroundCount:
+            self.beforeCount = args.aroundCount[0]
+            self.afterCount = args.aroundCount[0]
+
+        if self.beforeCount:
+            self.beforeContext = deque(maxlen=int(self.beforeCount))
 
         self.searching = False
 
@@ -89,10 +105,11 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.ui2.checkBox_4.setEnabled(self.ui2.checkBox_3.isChecked())
 
         self.lineEdit.setText(
-            QtCore.QCoreApplication.translate("MainWindow",
-                                              ":".join(args.filedirs)))
+            QtCore.QCoreApplication.translate("MainWindow", ":".join(args.filedirs))
+        )
         self.lineEdit_2.setText(
-            QtCore.QCoreApplication.translate("MainWindow", args.pattern))
+            QtCore.QCoreApplication.translate("MainWindow", args.pattern)
+        )
 
         self.statusbar.showMessage("ready")
 
@@ -155,7 +172,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
             self.outputLine("|123456789" * 8)
 
         if not self.raw:
-            self.buf.append('</font>')
+            self.buf.append("</font>")
 
     def search(self):
         if self.searching:
@@ -257,16 +274,55 @@ class YapgrepGuiProgram(Ui_MainWindow):
             i += 1
         fmt = "Files searched: {}, Matched files: {}, Matches found: {}"
         print(fmt.format(self.files, self.matchedFiles, self.matches))
-        self.textEdit.append(
-            fmt.format(self.files, self.matchedFiles, self.matches))
+        self.textEdit.append(fmt.format(self.files, self.matchedFiles, self.matches))
         ic(fmt.format(self.files, self.matchedFiles, self.matches))
         self.files, self.matchedFiles, self.matches = 0, 0, 0
+
+    def outputFormattedLine(self, line, pattern, i):
+        if self.linenumber:
+            if self.column:
+                for m in regex.finditer(pattern, line):
+                    c = m.start()
+                    break
+                line = html.escape(line)
+                line = (
+                    line
+                    if self.raw
+                    else regex.sub(pattern, r'<font color="red"><b>\1</b></font>', line)
+                )
+                fmt = "{}:{}:{}" if self.raw else '<font color="blue">{}:{}:</font>{}'
+
+                if self.ruler:
+                    self.printRuler(fmt, line, i, c)
+
+                self.outputLine(fmt.format(str(i), str(c), line))
+            else:
+                line = html.escape(line)
+                line = (
+                    line
+                    if self.raw
+                    else regex.sub(pattern, r'<font color="red"><b>\1</b></font>', line)
+                )
+                fmt = "{}:{}" if self.raw else '<font color="blue">{}:</font>{}'
+                if self.ruler:
+                    self.printRuler(fmt, line, i)
+
+                self.outputLine(fmt.format(str(i), line))
+        else:
+            line = html.escape(line)
+            line = (
+                line
+                if self.raw
+                else regex.sub(pattern, r'<font color="red"><b>\1</b></font>', line)
+            )
+            if self.ruler:
+                self.printRuler("{}", line)
+            self.outputLine(line)
 
     def grepFile(self, fileName, pattern):
         global app
         self.statusbar.showMessage(fileName)
-        app.processEvents(
-        )  # TODO: move into file loop with (i % 10000) == 0 ???
+        app.processEvents()  # TODO: move into file loop with (i % 10000) == 0 ???
         if not self.searching:
             raise YapCancel
         self.buf = []
@@ -274,51 +330,34 @@ class YapgrepGuiProgram(Ui_MainWindow):
         with open(fileName, "r") as f:
             try:
                 self.files += 1
+                ac = 0
                 for i, line in enumerate(f):
+                    line = line.rstrip("\n")
                     if pattern.search(line):
                         self.matches += 1
                         matchFound = True
-                        line = line.rstrip("\n")
-                        if self.linenumber:
-                            if self.column:
-                                for m in regex.finditer(pattern, line):
-                                    c = m.start()
-                                    break
-                                line = html.escape(line)
-                                line = (line if self.raw else regex.sub(
-                                    pattern,
-                                    r'<font color="red"><b>\1</b></font>',
-                                    line,
-                                ))
-                                fmt = ("{}:{}:{}" if self.raw else
-                                       '<font color="blue">{}:{}:</font>{}')
+                        if self.beforeCount:
+                            for j, l in enumerate(self.beforeContext):
+                                ln = i - (int(len(self.beforeContext)) - j)
+                                if ln >= 0:
+                                    self.outputFormattedLine(l, pattern, ln)
+                            self.beforeContext.clear()
 
-                                if self.ruler:
-                                    self.printRuler(fmt, line, i, c)
+                        self.outputFormattedLine(line, pattern, i)
 
-                                self.outputLine(
-                                    fmt.format(str(i), str(c), line))
+                        if self.afterCount:
+                            ac = int(self.afterCount)
+                    else:
+                        if self.afterCount:
+                            if ac > 0:
+                                self.outputFormattedLine(line, pattern, i)
+                                ac -= 1
                             else:
-                                line = html.escape(line)
-                                line = (line if self.raw else regex.sub(
-                                    pattern,
-                                    r'<font color="red"><b>\1</b></font>',
-                                    line,
-                                ))
-                                fmt = ("{}:{}" if self.raw else
-                                       '<font color="blue">{}:</font>{}')
-                                if self.ruler:
-                                    self.printRuler(fmt, line, i)
-
-                                self.outputLine(fmt.format(str(i), line))
+                                if self.beforeCount:
+                                    self.beforeContext.append(line)
                         else:
-                            line = html.escape(line)
-                            line = (line if self.raw else regex.sub(
-                                pattern, r'<font color="red"><b>\1</b></font>',
-                                line))
-                            if self.ruler:
-                                self.printRuler("{}", line)
-                            self.outputLine(line)
+                            if self.beforeCount:
+                                self.beforeContext.append(line)
             except UnicodeDecodeError:
                 pass
         if matchFound:
@@ -347,10 +386,7 @@ if __name__ == "__main__":
         default=True,
     )
     group.add_argument(
-        "-i",
-        "--ignorecase",
-        help="ignore case of search term",
-        action="store_true"
+        "-i", "--ignorecase", help="ignore case of search term", action="store_true"
     )
     group1 = argparser.add_mutually_exclusive_group()
     group1.add_argument(
@@ -369,10 +405,8 @@ if __name__ == "__main__":
         dest="recurse",
     )
     argparser.add_argument(
-        "-g",
-        "--go",
-        help="implicitly push the search button",
-        action="store_true")
+        "-g", "--go", help="implicitly push the search button", action="store_true"
+    )
     argparser.add_argument(
         "-t",
         "--type",
@@ -415,9 +449,31 @@ if __name__ == "__main__":
     )
 
     argparser.add_argument(
-        "--ruler",
-        help="print out a column ruler for each line",
-        action="store_true",
+        "--ruler", help="print out a column ruler for each line", action="store_true"
+    )
+
+    argparser.add_argument(
+        "-B",
+        "--before-context",
+        help="print out N lines of context before a matched line",
+        action="append",
+        dest="beforeCount",
+    )
+
+    argparser.add_argument(
+        "-A",
+        "--after-context",
+        help="print out N lines of context after a matched line",
+        action="append",
+        dest="afterCount",
+    )
+
+    argparser.add_argument(
+        "-C",
+        "--context",
+        help="print out N lines of context around a matched line",
+        action="append",
+        dest="aroundCount",
     )
 
     argparser.add_argument("pattern", nargs="?", default="")
