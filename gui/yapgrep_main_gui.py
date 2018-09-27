@@ -90,6 +90,8 @@ class YapgrepGuiProgram(Ui_MainWindow):
         if self.beforeCount:
             self.beforeContext = deque(maxlen=int(self.beforeCount))
 
+        self.ui2.lineEdit.setText(str(self.beforeCount))
+        
         self.searching = False
 
         self.ui2.checkBox.setChecked(self.recursive)
@@ -138,6 +140,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.raw = self.ui2.checkBox_6.isChecked()
         self.ruler = self.ui2.checkBox_7.isChecked()
         self.fileSearch = self.ui2.checkBox_8.isChecked()
+        self.beforeCount = int(self.ui2.lineEdit.text())
 
     def about(self):
         msg = QMessageBox()
@@ -413,6 +416,7 @@ if __name__ == "__main__":
         help="specify filetypes for search",
         action="append",
         dest="ftype",
+        type=str
     )
     argparser.add_argument(
         "-l",
@@ -458,6 +462,7 @@ if __name__ == "__main__":
         help="print out N lines of context before a matched line",
         action="append",
         dest="beforeCount",
+        type=int
     )
 
     argparser.add_argument(
@@ -466,6 +471,7 @@ if __name__ == "__main__":
         help="print out N lines of context after a matched line",
         action="append",
         dest="afterCount",
+        type=int
     )
 
     argparser.add_argument(
@@ -474,11 +480,16 @@ if __name__ == "__main__":
         help="print out N lines of context around a matched line",
         action="append",
         dest="aroundCount",
+        type=int
     )
 
     argparser.add_argument("pattern", nargs="?", default="")
     argparser.add_argument("filedirs", nargs="*", default=[os.getcwd()])
     args = argparser.parse_args()
+
+    if args.aroundCount and (args.beforeCount or args.afterCount):
+        print("error: -C/--context: not allowed with -B/--before or -A/--after", file=sys.stderr)
+        sys.exit(1)
 
     if args.helptypes:
         with open("types.json", "r") as f:

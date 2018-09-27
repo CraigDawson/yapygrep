@@ -150,12 +150,37 @@
     <string>Files</string>
    </property>
   </widget>
+  <widget class="QLineEdit" name="lineEdit">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>290</y>
+     <width>113</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>290</y>
+     <width>101</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Before Count</string>
+   </property>
+  </widget>
   <zorder>groupBox</zorder>
   <zorder>layoutWidget</zorder>
   <zorder>buttonBox</zorder>
   <zorder>listWidget</zorder>
   <zorder>label</zorder>
   <zorder>checkBox_8</zorder>
+  <zorder>lineEdit</zorder>
+  <zorder>label_2</zorder>
  </widget>
  <resources/>
  <connections>
