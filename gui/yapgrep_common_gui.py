@@ -68,6 +68,12 @@ class Ui_Common(object):
         self.label_2 = QtWidgets.QLabel(Common)
         self.label_2.setGeometry(QtCore.QRect(30, 290, 101, 16))
         self.label_2.setObjectName("label_2")
+        self.lineEdit_2 = QtWidgets.QLineEdit(Common)
+        self.lineEdit_2.setGeometry(QtCore.QRect(140, 320, 113, 22))
+        self.lineEdit_2.setObjectName("lineEdit_2")
+        self.label_3 = QtWidgets.QLabel(Common)
+        self.label_3.setGeometry(QtCore.QRect(30, 320, 101, 16))
+        self.label_3.setObjectName("label_3")
         self.groupBox.raise_()
         self.layoutWidget.raise_()
         self.buttonBox.raise_()
@@ -76,6 +82,8 @@ class Ui_Common(object):
         self.checkBox_8.raise_()
         self.lineEdit.raise_()
         self.label_2.raise_()
+        self.lineEdit_2.raise_()
+        self.label_3.raise_()
 
         self.retranslateUi(Common)
         self.buttonBox.accepted.connect(Common.accept)
@@ -97,4 +105,5 @@ class Ui_Common(object):
         self.checkBox_7.setText(_translate("Common", "Ruler"))
         self.checkBox_8.setText(_translate("Common", "Files"))
         self.label_2.setText(_translate("Common", "Before Count"))
+        self.label_3.setText(_translate("Common", "After Count"))
 

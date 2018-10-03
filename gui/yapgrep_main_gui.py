@@ -90,7 +90,15 @@ class YapgrepGuiProgram(Ui_MainWindow):
         if self.beforeCount:
             self.beforeContext = deque(maxlen=int(self.beforeCount))
 
-        self.ui2.lineEdit.setText(str(self.beforeCount))
+        if self.beforeCount:
+            self.ui2.lineEdit.setText(str(self.beforeCount))
+        else:
+            self.ui2.lineEdit.setText('0')
+
+        if self.afterCount:
+            self.ui2.lineEdit_2.setText(str(self.afterCount))
+        else:
+            self.ui2.lineEdit_2.setText('0')
         
         self.searching = False
 
@@ -141,6 +149,8 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.ruler = self.ui2.checkBox_7.isChecked()
         self.fileSearch = self.ui2.checkBox_8.isChecked()
         self.beforeCount = int(self.ui2.lineEdit.text())
+        self.beforeContext = deque(maxlen=int(self.beforeCount))
+        self.afterCount = int(self.ui2.lineEdit_2.text())
 
     def about(self):
         msg = QMessageBox()
@@ -155,7 +165,10 @@ class YapgrepGuiProgram(Ui_MainWindow):
     def cancel(self):
         raise YapCancel("Cancel", "Canceled")
 
-    def printRuler(self, fmt, line, ln=None, cn=None):
+    def printRuler(self, context, fmt, line, ln=None, cn=None):
+        if context:
+            return
+
         s = ""
         for n in range(8):
             s += str(n) + " " * 9
@@ -281,9 +294,10 @@ class YapgrepGuiProgram(Ui_MainWindow):
         ic(fmt.format(self.files, self.matchedFiles, self.matches))
         self.files, self.matchedFiles, self.matches = 0, 0, 0
 
-    def outputFormattedLine(self, line, pattern, i):
+    def outputFormattedLine(self, line, pattern, i, context):
         if self.linenumber:
             if self.column:
+                c = -1
                 for m in regex.finditer(pattern, line):
                     c = m.start()
                     break
@@ -293,12 +307,21 @@ class YapgrepGuiProgram(Ui_MainWindow):
                     if self.raw
                     else regex.sub(pattern, r'<font color="red"><b>\1</b></font>', line)
                 )
-                fmt = "{}:{}:{}" if self.raw else '<font color="blue">{}:{}:</font>{}'
+
+                b = len(str(c)) + 1
+                blanks = ' ' * b
+                if context:
+                    fmt = "{}-{}{}" if self.raw else '<font color="green">{}{}-</font>{}'
+                else:
+                    fmt = "{}:{}:{}" if self.raw else '<font color="blue">{}:{}:</font>{}'
 
                 if self.ruler:
-                    self.printRuler(fmt, line, i, c)
+                    self.printRuler(context, fmt, line, i, c)
 
-                self.outputLine(fmt.format(str(i), str(c), line))
+                if c == -1:
+                    self.outputLine(fmt.format(str(i), blanks, line))
+                else:
+                    self.outputLine(fmt.format(str(i), str(c), line))
             else:
                 line = html.escape(line)
                 line = (
@@ -306,9 +329,12 @@ class YapgrepGuiProgram(Ui_MainWindow):
                     if self.raw
                     else regex.sub(pattern, r'<font color="red"><b>\1</b></font>', line)
                 )
-                fmt = "{}:{}" if self.raw else '<font color="blue">{}:</font>{}'
+                if context:
+                    fmt = "{}-{}" if self.raw else '<font color="green">{}-</font>{}'
+                else:
+                    fmt = "{}:{}" if self.raw else '<font color="blue">{}:</font>{}'
                 if self.ruler:
-                    self.printRuler(fmt, line, i)
+                    self.printRuler(context, fmt, line, i)
 
                 self.outputLine(fmt.format(str(i), line))
         else:
@@ -319,7 +345,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
                 else regex.sub(pattern, r'<font color="red"><b>\1</b></font>', line)
             )
             if self.ruler:
-                self.printRuler("{}", line)
+                self.printRuler(context, "{}", line)
             self.outputLine(line)
 
     def grepFile(self, fileName, pattern):
@@ -330,6 +356,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
             raise YapCancel
         self.buf = []
         matchFound = False
+        supress = True
         with open(fileName, "r") as f:
             try:
                 self.files += 1
@@ -339,21 +366,24 @@ class YapgrepGuiProgram(Ui_MainWindow):
                     if pattern.search(line):
                         self.matches += 1
                         matchFound = True
+                        if (self.beforeCount or self.afterCount) and not supress:
+                            self.outputLine('--')
+                        supress = False
                         if self.beforeCount:
                             for j, l in enumerate(self.beforeContext):
                                 ln = i - (int(len(self.beforeContext)) - j)
                                 if ln >= 0:
-                                    self.outputFormattedLine(l, pattern, ln)
+                                    self.outputFormattedLine(l, pattern, ln, True)
                             self.beforeContext.clear()
 
-                        self.outputFormattedLine(line, pattern, i)
+                        self.outputFormattedLine(line, pattern, i, False)
 
                         if self.afterCount:
                             ac = int(self.afterCount)
                     else:
                         if self.afterCount:
                             if ac > 0:
-                                self.outputFormattedLine(line, pattern, i)
+                                self.outputFormattedLine(line, pattern, i, True)
                                 ac -= 1
                             else:
                                 if self.beforeCount:
