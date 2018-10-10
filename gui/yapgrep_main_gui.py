@@ -83,6 +83,10 @@ class YapgrepGuiProgram(Ui_MainWindow):
         else:
             self.afterCount = None
 
+        self.groupSeparator = args.groupSeparator
+        ic(self.ui2)
+        self.ui2.lineEdit_3.setText(self.groupSeparator)
+        
         if args.aroundCount:
             self.beforeCount = args.aroundCount[0]
             self.afterCount = args.aroundCount[0]
@@ -99,6 +103,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
             self.ui2.lineEdit_2.setText(str(self.afterCount))
         else:
             self.ui2.lineEdit_2.setText('0')
+
         
         self.searching = False
 
@@ -121,6 +126,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
             QtCore.QCoreApplication.translate("MainWindow", args.pattern)
         )
 
+        
         self.statusbar.showMessage("ready")
 
         self.typeList = []  # list of file exts
@@ -151,7 +157,8 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.beforeCount = int(self.ui2.lineEdit.text())
         self.beforeContext = deque(maxlen=int(self.beforeCount))
         self.afterCount = int(self.ui2.lineEdit_2.text())
-
+        self.groupSeparator = self.ui2.lineEdit_3.text()
+        
     def about(self):
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Information)
@@ -367,7 +374,8 @@ class YapgrepGuiProgram(Ui_MainWindow):
                         self.matches += 1
                         matchFound = True
                         if (self.beforeCount or self.afterCount) and not supress:
-                            self.outputLine('--')
+                            ic(self.groupSeparator)
+                            self.outputLine(self.groupSeparator)
                         supress = False
                         if self.beforeCount:
                             for j, l in enumerate(self.beforeContext):
@@ -513,6 +521,24 @@ if __name__ == "__main__":
         type=int
     )
 
+    group2 = argparser.add_mutually_exclusive_group()
+
+    group2.add_argument(
+        "--group-separator",
+        help="string to print out between context matches",
+        dest="groupSeparator",
+        default="--",
+        type=str,
+        )
+    group2.add_argument(
+        "--no-group-separator",
+        help="use no string to print out between context matches",
+        action="store_true",
+        dest="noGroupSeparator",
+        default=False,
+        )
+    
+    
     argparser.add_argument("pattern", nargs="?", default="")
     argparser.add_argument("filedirs", nargs="*", default=[os.getcwd()])
     args = argparser.parse_args()
@@ -521,6 +547,9 @@ if __name__ == "__main__":
         print("error: -C/--context: not allowed with -B/--before or -A/--after", file=sys.stderr)
         sys.exit(1)
 
+    if args.noGroupSeparator:
+        args.groupSeparator = ""
+        
     if args.helptypes:
         with open("types.json", "r") as f:
             types = json.load(f)
