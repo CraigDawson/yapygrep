@@ -84,7 +84,6 @@ class YapgrepGuiProgram(Ui_MainWindow):
             self.afterCount = None
 
         self.groupSeparator = args.groupSeparator
-        ic(self.ui2)
         self.ui2.lineEdit_3.setText(self.groupSeparator)
         
         if args.aroundCount:
@@ -116,7 +115,6 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.ui2.checkBox_7.setChecked(self.ruler)
         self.ui2.checkBox_8.setChecked(self.fileSearch)
 
-        #        ic(self.ui2.checkBox_3.isChecked())
         self.ui2.checkBox_4.setEnabled(self.ui2.checkBox_3.isChecked())
 
         self.lineEdit.setText(
@@ -374,7 +372,6 @@ class YapgrepGuiProgram(Ui_MainWindow):
                         self.matches += 1
                         matchFound = True
                         if (self.beforeCount or self.afterCount) and not supress:
-                            ic(self.groupSeparator)
                             self.outputLine(self.groupSeparator)
                         supress = False
                         if self.beforeCount:
