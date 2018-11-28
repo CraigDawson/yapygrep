@@ -6,14 +6,13 @@ import json
 import os
 import sys
 import os.path
-import pkg_resources
+# import package
 import traceback
 import zipfile
 from datetime import datetime
 from collections import deque
 
 import regex
-# from icecream import ic
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QDialog, QListWidgetItem, QMessageBox, qApp
 
@@ -89,9 +88,8 @@ class YapgrepGuiProgram(Ui_MainWindow):
             self.afterCount = None
 
         self.groupSeparator = args.groupSeparator
-        # ic(self.ui2)
         self.ui2.lineEdit_3.setText(self.groupSeparator)
-        
+
         if args.aroundCount:
             self.beforeCount = args.aroundCount[0]
             self.afterCount = args.aroundCount[0]
@@ -109,7 +107,6 @@ class YapgrepGuiProgram(Ui_MainWindow):
         else:
             self.ui2.lineEdit_2.setText('0')
 
-        
         self.searching = False
 
         self.ui2.checkBox.setChecked(self.recursive)
@@ -121,17 +118,14 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.ui2.checkBox_7.setChecked(self.ruler)
         self.ui2.checkBox_8.setChecked(self.fileSearch)
 
-        #        ic(self.ui2.checkBox_3.isChecked())
         self.ui2.checkBox_4.setEnabled(self.ui2.checkBox_3.isChecked())
 
         self.lineEdit.setText(
-            QtCore.QCoreApplication.translate("MainWindow", ":".join(args.filedirs))
-        )
+            QtCore.QCoreApplication.translate("MainWindow",
+                                              ":".join(args.filedirs)))
         self.lineEdit_2.setText(
-            QtCore.QCoreApplication.translate("MainWindow", args.pattern)
-        )
+            QtCore.QCoreApplication.translate("MainWindow", args.pattern))
 
-        
         self.statusbar.showMessage("ready")
 
         self.typeList = []  # list of file exts
@@ -163,7 +157,7 @@ class YapgrepGuiProgram(Ui_MainWindow):
         self.beforeContext = deque(maxlen=int(self.beforeCount))
         self.afterCount = int(self.ui2.lineEdit_2.text())
         self.groupSeparator = self.ui2.lineEdit_3.text()
-        
+
     def about(self):
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Information)
@@ -225,7 +219,6 @@ class YapgrepGuiProgram(Ui_MainWindow):
 
             for d in directory.split(":"):
                 self.start = datetime.now()
-                # ic("Directory from user: {}".format(d))
 
                 try:
                     self.walkDirs(d, reg)
@@ -273,9 +266,6 @@ class YapgrepGuiProgram(Ui_MainWindow):
         for i in range(ui.ui2.listWidget.count()):
             if ui.ui2.listWidget.item(i).checkState() == QtCore.Qt.Checked:
                 self.typeList += types[str(ui.ui2.listWidget.item(i).text())]
-                # ic(types[str(ui.ui2.listWidget.item(i).text())])
-
-        # ic(fs)
 
         i = 0
         for p in glob.iglob(fs, recursive=self.recursive):
@@ -302,8 +292,8 @@ class YapgrepGuiProgram(Ui_MainWindow):
             i += 1
         fmt = "Files searched: {}, Matched files: {}, Matches found: {}"
         print(fmt.format(self.files, self.matchedFiles, self.matches))
-        self.textEdit.append(fmt.format(self.files, self.matchedFiles, self.matches))
-        # ic(fmt.format(self.files, self.matchedFiles, self.matches))
+        self.textEdit.append(
+            fmt.format(self.files, self.matchedFiles, self.matches))
         self.files, self.matchedFiles, self.matches = 0, 0, 0
 
     def outputFormattedLine(self, line, pattern, i, context):
@@ -314,11 +304,8 @@ class YapgrepGuiProgram(Ui_MainWindow):
                     c = m.start()
                     break
                 line = html.escape(line)
-                line = (
-                    line
-                    if self.raw
-                    else regex.sub(pattern, r'<font color="red"><b>\1</b></font>', line)
-                )
+                line = (line if self.raw else regex.sub(
+                    pattern, r'<font color="red"><b>\1</b></font>', line))
 
                 b = len(str(c)) + 1
                 blanks = ' ' * b
@@ -336,11 +323,8 @@ class YapgrepGuiProgram(Ui_MainWindow):
                     self.outputLine(fmt.format(str(i), str(c), line))
             else:
                 line = html.escape(line)
-                line = (
-                    line
-                    if self.raw
-                    else regex.sub(pattern, r'<font color="red"><b>\1</b></font>', line)
-                )
+                line = (line if self.raw else regex.sub(
+                    pattern, r'<font color="red"><b>\1</b></font>', line))
                 if context:
                     fmt = "{}-{}" if self.raw else '<font color="green">{}-</font>{}'
                 else:
@@ -351,11 +335,8 @@ class YapgrepGuiProgram(Ui_MainWindow):
                 self.outputLine(fmt.format(str(i), line))
         else:
             line = html.escape(line)
-            line = (
-                line
-                if self.raw
-                else regex.sub(pattern, r'<font color="red"><b>\1</b></font>', line)
-            )
+            line = (line if self.raw else regex.sub(
+                pattern, r'<font color="red"><b>\1</b></font>', line))
             if self.ruler:
                 self.printRuler(context, "{}", line)
             self.outputLine(line)
@@ -363,7 +344,8 @@ class YapgrepGuiProgram(Ui_MainWindow):
     def grepFile(self, fileName, pattern):
         global app
         self.statusbar.showMessage(fileName)
-        app.processEvents()  # TODO: move into file loop with (i % 10000) == 0 ???
+        app.processEvents(
+        )  # TODO: move into file loop with (i % 10000) == 0 ???
         if not self.searching:
             raise YapCancel
         self.buf = []
@@ -378,15 +360,16 @@ class YapgrepGuiProgram(Ui_MainWindow):
                     if pattern.search(line):
                         self.matches += 1
                         matchFound = True
-                        if (self.beforeCount or self.afterCount) and not supress:
-                            # ic(self.groupSeparator)
+                        if (self.beforeCount
+                                or self.afterCount) and not supress:
                             self.outputLine(self.groupSeparator)
                         supress = False
                         if self.beforeCount:
                             for j, l in enumerate(self.beforeContext):
                                 ln = i - (int(len(self.beforeContext)) - j)
                                 if ln >= 0:
-                                    self.outputFormattedLine(l, pattern, ln, True)
+                                    self.outputFormattedLine(
+                                        l, pattern, ln, True)
                             self.beforeContext.clear()
 
                         self.outputFormattedLine(line, pattern, i, False)
@@ -396,7 +379,8 @@ class YapgrepGuiProgram(Ui_MainWindow):
                     else:
                         if self.afterCount:
                             if ac > 0:
-                                self.outputFormattedLine(line, pattern, i, True)
+                                self.outputFormattedLine(
+                                    line, pattern, i, True)
                                 ac -= 1
                             else:
                                 if self.beforeCount:
@@ -434,8 +418,10 @@ if __name__ == "__main__":
         default=True,
     )
     group.add_argument(
-        "-i", "--ignorecase", help="ignore case of search term", action="store_true"
-    )
+        "-i",
+        "--ignorecase",
+        help="ignore case of search term",
+        action="store_true")
     group1 = argparser.add_mutually_exclusive_group()
     group1.add_argument(
         "-r",
@@ -453,16 +439,17 @@ if __name__ == "__main__":
         dest="recurse",
     )
     argparser.add_argument(
-        "-g", "--go", help="implicitly push the search button", action="store_true"
-    )
+        "-g",
+        "--go",
+        help="implicitly push the search button",
+        action="store_true")
     argparser.add_argument(
         "-t",
         "--type",
         help="specify filetypes for search",
         action="append",
         dest="ftype",
-        type=str
-    )
+        type=str)
     argparser.add_argument(
         "-l",
         "--line-number",
@@ -498,8 +485,9 @@ if __name__ == "__main__":
     )
 
     argparser.add_argument(
-        "--ruler", help="print out a column ruler for each line", action="store_true"
-    )
+        "--ruler",
+        help="print out a column ruler for each line",
+        action="store_true")
 
     argparser.add_argument(
         "-B",
@@ -507,8 +495,7 @@ if __name__ == "__main__":
         help="print out N lines of context before a matched line",
         action="append",
         dest="beforeCount",
-        type=int
-    )
+        type=int)
 
     argparser.add_argument(
         "-A",
@@ -516,8 +503,7 @@ if __name__ == "__main__":
         help="print out N lines of context after a matched line",
         action="append",
         dest="afterCount",
-        type=int
-    )
+        type=int)
 
     argparser.add_argument(
         "-C",
@@ -525,8 +511,7 @@ if __name__ == "__main__":
         help="print out N lines of context around a matched line",
         action="append",
         dest="aroundCount",
-        type=int
-    )
+        type=int)
 
     group2 = argparser.add_mutually_exclusive_group()
 
@@ -536,72 +521,65 @@ if __name__ == "__main__":
         dest="groupSeparator",
         default="--",
         type=str,
-        )
+    )
     group2.add_argument(
         "--no-group-separator",
         help="use no string to print out between context matches",
         action="store_true",
         dest="noGroupSeparator",
         default=False,
-        )
-    
-    
+    )
+
     argparser.add_argument("pattern", nargs="?", default="")
     argparser.add_argument("filedirs", nargs="*", default=[os.getcwd()])
     args = argparser.parse_args()
 
     if args.aroundCount and (args.beforeCount or args.afterCount):
-        print("error: -C/--context: not allowed with -B/--before or -A/--after", file=sys.stderr)
+        print(
+            "error: -C/--context: not allowed with -B/--before or -A/--after",
+            file=sys.stderr)
         sys.exit(1)
 
     if args.noGroupSeparator:
         args.groupSeparator = ""
-        
+
     if args.helptypes:
         try:
-            with open(__file__ + "data/types.json", "r") as f:
-                types = json.load(f)
+            # open file from within the egg
+            eggFile = os.path.abspath(
+                os.path.dirname(__file__)).split('EGG-INFO')[0].rstrip('/')
 
-                for t in types:
-                    print(t, ":", types[t])
+            with zipfile.ZipFile(eggFile, 'r') as zip:
+                with zip.open('bin/data/types.json', 'r') as f:
+                    df = f.read().decode('utf-8')
+                    types = json.loads(df)
+
+                    for t in types:
+                        print(t, ":", types[t])
         except:  # noqa: E722
             pass
-        # sys.exit(1)
-
-    # ic(args.filedirs)
+        sys.exit(1)
 
     MainWindow = QtWidgets.QMainWindow()
 
     ui = YapgrepGuiProgram(MainWindow, args)
 
-    # ic(args)
-
     MainWindow.show()
 
     # Read in valid types
     try:
-        # df = os.path.dirname(__file__) + "/bin/data/types.json"
-        # df = __loader__.get_data('/bin/data/types.json') 
-        # ic(df)
-
-        zip = zipfile.ZipFile('/usr/local/lib/python3.5/dist-packages/yapgrep-0.6-py3.5.egg', 'r')
-
         # open file from within the egg
-        f = zip.open('bin/data/types.json', 'r')
-        df = f.read() 
-        print("__name__ = ", __name__)
-        print("df = ", df)
-        print("__file__ = ", __file__)
-        print("__loader__ = ", __loader__)
-        # my_data = pkg_resources.resource_string(__name__, "/bin/data/types.json")
-        # print("my_data = ", my_data)
-        with open(df, "r") as f:
-            types = json.load(f)
+        eggFile = os.path.abspath(
+            os.path.dirname(__file__)).split('EGG-INFO')[0].rstrip('/')
 
-            for t in sorted(types):
-                wi = QListWidgetItem(t)
-                wi.setCheckState(QtCore.Qt.Unchecked)
-                ui.ui2.listWidget.addItem(wi)
+        with zipfile.ZipFile(eggFile, 'r') as zip:
+            with zip.open('bin/data/types.json', 'r') as f:
+                df = f.read().decode('utf-8')
+                types = json.loads(df)
+                for t in sorted(types):
+                    wi = QListWidgetItem(t)
+                    wi.setCheckState(QtCore.Qt.Unchecked)
+                    ui.ui2.listWidget.addItem(wi)
     except:  # noqa: E722
         traceback.print_exc()
 
@@ -610,14 +588,12 @@ if __name__ == "__main__":
         for t in args.ftype:
             if t in types:
                 ui.typeList += types[t]
-                # ic(ui.typeList)
                 item = ui.ui2.listWidget.findItems(t, QtCore.Qt.MatchExactly)
 
                 if item:
                     item[0].setCheckState(QtCore.Qt.Checked)
             else:
                 msg = "User specified type not found: {}".format(t)
-                # ic(msg)
                 ui.textEdit.append('<font color="red">{}</font>'.format(msg))
 
     if args.go:

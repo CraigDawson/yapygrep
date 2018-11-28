@@ -17,6 +17,7 @@ setup(
     long_description=long_description,
     url="https://github.com/CraigDawson/yapygrep",
     packages=find_packages(),
+    include_package_data=True,
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
